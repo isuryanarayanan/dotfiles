@@ -1,3 +1,31 @@
+" Installing Vim-Plug
+
+let vimplug_exists=expand('~/.config/nvim/autoload/plug.vim')
+if has('win32')&&!has('win64')
+  let curl_exists=expand('C:\Windows\Sysnative\curl.exe')
+else
+  let curl_exists=expand('curl')
+endif
+
+let g:vim_bootstrap_langs = "html,javascript,python,typescript"
+let g:vim_bootstrap_editor = "nvim"				" nvim or vim
+let g:vim_bootstrap_theme = "molokai"
+let g:vim_bootstrap_frams = "vuejs"
+
+if !filereadable(vimplug_exists)
+  if !executable(curl_exists)
+    echoerr "You have to install curl or first install vim-plug yourself!"
+    execute "q!"
+  endif
+  echo "Installing Vim-Plug..."
+  echo ""
+  silent exec "!"curl_exists" -fLo " . shellescape(vimplug_exists) . " --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+  let g:not_finish_vimplug = "yes"
+
+  autocmd VimEnter * PlugInstall
+endif
+
+
 call plug#begin('~/.vim/plugged')
 
 Plug 'bling/vim-airline'
@@ -8,6 +36,7 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'Chiel92/vim-autoformat'
 Plug 'ambv/black'
 Plug 'dense-analysis/ale'
+Plug 'tomasr/molokai'
 
 syntax on
 nmap <C-n> :NERDTreeToggle<CR>
@@ -26,6 +55,7 @@ nmap ++ <plug>NERDCommenterToggle
 
 autocmd VimEnter * NERDTreeToggle
 let NERDTreeShowHidden=1
+
 set relativenumber
 "set smarttab
 set cindent
@@ -33,16 +63,11 @@ set tabstop=2
 set shiftwidth=2
 set nowrap
 set encoding=utf-8
-
 set hidden
-
 set nobackup
 set nowritebackup
-
 set cmdheight=2
-
 set updatetime=300
-
 set shortmess+=c
 
 if has("patch-8.1.1564")
