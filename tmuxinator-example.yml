@@ -1,0 +1,15 @@
+name: projectname 
+root: /project-path/
+
+windows:
+  - editor:
+      panes:
+        - cmatrix && vim
+  - window1:
+      layout: main-vertical
+      panes:
+        - cd project/
+  - window2:
+      layout: main-vertical
+      panes:
+        - cd project/
