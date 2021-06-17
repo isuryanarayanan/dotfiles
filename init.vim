@@ -37,7 +37,7 @@ Plug 'Chiel92/vim-autoformat'
 Plug 'ambv/black'
 Plug 'dense-analysis/ale'
 Plug 'tomasr/molokai'
-
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 syntax on
 nmap <C-n> :NERDTreeToggle<CR>
 command! -nargs=0 Prettier :CocCommand prettier.formatFile

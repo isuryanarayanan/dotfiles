@@ -10,7 +10,7 @@ fi
 
 $SUDO apt-get update -y
 $SUDO apt-get upgrade -y
-$SUDO apt-get install nodejs npm python3 python3-pip cmatrix tmux tmuxinator
+$SUDO apt-get install python3 python3-pip cmatrix tmux tmuxinator
 
 echo "Purging Vim and installing Neovim"
 $SUDO apt-get purge vim -y
