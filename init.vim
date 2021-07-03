@@ -38,7 +38,12 @@ Plug 'ambv/black'
 Plug 'dense-analysis/ale'
 Plug 'tomasr/molokai'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'wakatime/vim-wakatime'
 syntax on
+augroup SyntaxSettings
+    autocmd!
+    autocmd BufNewFile,BufRead *.tsx set filetype=typescript
+augroup END
 nmap <C-n> :NERDTreeToggle<CR>
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
 
