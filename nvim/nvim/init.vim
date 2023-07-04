@@ -1,5 +1,8 @@
 " Installing Vim-Plug
 
+"let mapleader = " "
+let mapleader = "\<Space>"
+
 let vimplug_exists=expand('~/.config/nvim/autoload/plug.vim')
 if has('win32')&&!has('win64')
   let curl_exists=expand('C:\Windows\Sysnative\curl.exe')
@@ -9,7 +12,7 @@ endif
 
 let g:vim_bootstrap_langs = "html,javascript,python,typescript"
 let g:vim_bootstrap_editor = "nvim"				" nvim or vim
-let g:vim_bootstrap_theme = "molokai"
+let g:vim_bootstrap_theme = "moonfly"
 let g:vim_bootstrap_frams = "vuejs"
 
 if !filereadable(vimplug_exists)
@@ -30,15 +33,21 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'bling/vim-airline'
 Plug 'scrooloose/nerdtree'
-Plug 'tpope/vim-commentary'
 Plug 'scrooloose/nerdcommenter'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'Chiel92/vim-autoformat'
-Plug 'ambv/black'
-Plug 'dense-analysis/ale'
-Plug 'tomasr/molokai'
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+"Plug 'tomasr/molokai'
 Plug 'wakatime/vim-wakatime'
+Plug 'bluz71/vim-moonfly-colors', { 'as': 'moonfly' }
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'lewis6991/gitsigns.nvim' " OPTIONAL: for git status
+Plug 'nvim-tree/nvim-web-devicons' " OPTIONAL: for file icons
+Plug 'romgrk/barbar.nvim'
+
+" Set the default fuzzy file search command to <Leader>f
+nnoremap <Leader>ff :FZF<CR>
+
 syntax on
 augroup SyntaxSettings
     autocmd!
