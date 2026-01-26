@@ -1,0 +1,32 @@
+# Wofi Configuration
+
+# Width and height
+width=600
+height=400
+
+# Location (center)
+location=center
+
+# Show icons
+show=drun
+
+# Allow images
+allow_images=true
+
+# Image size
+image_size=32
+
+# Number of columns
+columns=1
+
+# Hide scroll
+hide_scroll=true
+
+# Prompt
+prompt=Search...
+
+# Insensitive search
+insensitive=true
+
+# Match mode
+matching=fuzzy
