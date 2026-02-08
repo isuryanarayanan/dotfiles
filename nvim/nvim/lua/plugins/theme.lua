@@ -1,0 +1,1 @@
+/home/suryan/.config/omarchy/current/theme/neovim.lua
