@@ -12,6 +12,8 @@ curl -fsSL https://raw.githubusercontent.com/isuryanarayanan/dotfiles/master/set
 
 This will detect your OS (Linux or macOS), install dependencies, clone the repo, and set up tmux and neovim.
 
+> On macOS, run it as your normal user (not with `sudo`) because Homebrew does not allow root execution.
+
 ## What's included
 
 | Tool | Config | Setup method |
@@ -43,4 +45,3 @@ dotfiles/
     ├── setup_tmux.sh          # Symlinks ~/.tmux.conf to this repo
     └── .tmux.conf
 ```
-

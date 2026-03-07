@@ -20,6 +20,20 @@ err()   { printf "\033[1;31m[error]\033[0m %s\n" "$1"; exit 1; }
 
 command_exists() { command -v "$1" >/dev/null 2>&1; }
 
+is_root() {
+  [ "${EUID:-$(id -u)}" -eq 0 ]
+}
+
+run_privileged() {
+  if is_root; then
+    "$@"
+  elif command_exists sudo; then
+    sudo "$@"
+  else
+    err "This step needs elevated privileges, but sudo is not available. Re-run as root or install sudo."
+  fi
+}
+
 detect_os() {
   case "$(uname -s)" in
     Linux*)  echo "linux" ;;
@@ -70,16 +84,16 @@ install_packages_linux() {
   case "$distro" in
     debian)
       info "Detected Debian/Ubuntu-based distro"
-      sudo apt update
-      sudo apt install -y git tmux neovim ripgrep fd-find nodejs npm
+      run_privileged apt update
+      run_privileged apt install -y git tmux neovim ripgrep fd-find nodejs npm
       ;;
     arch)
       info "Detected Arch-based distro"
-      sudo pacman -Sy --noconfirm git tmux neovim ripgrep fd nodejs npm
+      run_privileged pacman -Sy --noconfirm git tmux neovim ripgrep fd nodejs npm
       ;;
     fedora)
       info "Detected Fedora/RHEL-based distro"
-      sudo dnf install -y git tmux neovim ripgrep fd-find nodejs npm
+      run_privileged dnf install -y git tmux neovim ripgrep fd-find nodejs npm
       ;;
     *)
       warn "Unknown Linux distro. Please install manually: git, tmux, neovim, ripgrep, fd, nodejs"
@@ -191,6 +205,10 @@ setup_nvim() {
 main() {
   local os
   os="$(detect_os)"
+
+  if [ "$os" = "macos" ] && is_root; then
+    err "Do not run this script as root on macOS (Homebrew forbids it). Run as your normal user without sudo."
+  fi
 
   echo ""
   echo "  ┌─────────────────────────────────┐"

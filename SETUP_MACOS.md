@@ -2,6 +2,8 @@
 
 Step-by-step guide to set up these dotfiles on a fresh macOS machine.
 
+> Run all commands in this guide as your normal user (without `sudo`). Homebrew fails when executed as root.
+
 ## Prerequisites
 
 ### Install Homebrew
