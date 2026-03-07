@@ -77,6 +77,24 @@ install_packages_macos() {
   ok "Packages installed"
 }
 
+install_tmux_sessionizer() {
+  if command_exists tmux-sessionizer; then
+    ok "tmux-sessionizer already installed"
+    return
+  fi
+
+  info "Installing tmux-sessionizer..."
+
+  if ! command_exists cargo; then
+    info "Installing Rust..."
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    . "$HOME/.cargo/env"
+  fi
+
+  cargo install tmux-sessionizer
+  ok "tmux-sessionizer installed"
+}
+
 install_packages_linux() {
   local distro
   distro="$(detect_linux_distro)"
@@ -223,6 +241,10 @@ main() {
     macos) install_packages_macos ;;
     linux) install_packages_linux ;;
   esac
+
+  # 1.5 Install tmux-sessionizer
+  info "Step 1.5/4: Installing tmux-sessionizer..."
+  install_tmux_sessionizer
 
   # 2. Clone/update dotfiles repo
   info "Step 2/4: Setting up dotfiles repository..."
