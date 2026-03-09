@@ -214,8 +214,38 @@ setup_nvim() {
   ln -s "$nvim_source" "$nvim_target"
   ok "Symlinked $nvim_target -> $nvim_source"
 
+  # Set up theme.lua (machine-specific, not tracked by git)
+  setup_nvim_theme
+
   info "Launch nvim to complete plugin installation (plugins install automatically on first start)"
   ok "Neovim setup complete"
+}
+
+setup_nvim_theme() {
+  local theme_file="$DOTFILES_DIR/nvim/nvim/lua/plugins/theme.lua"
+  local theme_default="$DOTFILES_DIR/nvim/nvim/lua/plugins/theme.lua.default"
+  local omarchy_theme="$HOME/.config/omarchy/current/theme/neovim.lua"
+
+  # If theme.lua already exists and is not a broken symlink, leave it alone
+  if [ -e "$theme_file" ]; then
+    ok "theme.lua already present"
+    return
+  fi
+
+  # Remove broken symlink if present
+  [ -L "$theme_file" ] && rm "$theme_file"
+
+  if [ -f "$omarchy_theme" ]; then
+    info "Omarchy detected, symlinking theme to $omarchy_theme"
+    ln -s "$omarchy_theme" "$theme_file"
+    ok "theme.lua -> $omarchy_theme"
+  elif [ -f "$theme_default" ]; then
+    info "Using default theme (tokyonight)"
+    cp "$theme_default" "$theme_file"
+    ok "theme.lua created from default"
+  else
+    warn "No theme.lua.default found, skipping theme setup"
+  fi
 }
 
 # ── Main ──────────────────────────────────────

@@ -6,3 +6,6 @@ debug
 foo.*
 *.log
 data
+
+# Machine-specific theme (managed by setup scripts)
+lua/plugins/theme.lua

@@ -339,6 +339,40 @@ verify_tmux_plugins() {
   ok "Tmux plugins up to date"
 }
 
+# ── Nvim theme ────────────────────────────────
+
+verify_nvim_theme() {
+  local theme_file="$DOTFILES_DIR/nvim/nvim/lua/plugins/theme.lua"
+  local theme_default="$DOTFILES_DIR/nvim/nvim/lua/plugins/theme.lua.default"
+  local omarchy_theme="$HOME/.config/omarchy/current/theme/neovim.lua"
+
+  info "Checking nvim theme.lua..."
+
+  # If theme.lua exists and is not a broken symlink, it's fine
+  if [ -e "$theme_file" ]; then
+    ok "theme.lua present"
+    return
+  fi
+
+  # Remove broken symlink if present
+  if [ -L "$theme_file" ]; then
+    warn "theme.lua is a broken symlink, removing..."
+    rm "$theme_file"
+  fi
+
+  if [ -f "$omarchy_theme" ]; then
+    info "Omarchy detected, symlinking theme to $omarchy_theme"
+    ln -s "$omarchy_theme" "$theme_file"
+    ok "theme.lua -> $omarchy_theme"
+  elif [ -f "$theme_default" ]; then
+    info "Using default theme (tokyonight)"
+    cp "$theme_default" "$theme_file"
+    ok "theme.lua created from default"
+  else
+    warn "No theme.lua.default found, skipping theme setup"
+  fi
+}
+
 # ── Main ──────────────────────────────────────
 
 main() {
@@ -357,23 +391,27 @@ main() {
   echo ""
 
   # 1. Check & install packages
-  info "Step 1/4: Checking installed packages..."
+  info "Step 1/5: Checking installed packages..."
   if ! check_packages "$os"; then
     install_missing_packages "$os"
     check_packages "$os" || warn "Some packages may still be missing"
   fi
 
   # 2. Sync dotfiles repo
-  info "Step 2/4: Syncing dotfiles repository..."
+  info "Step 2/5: Syncing dotfiles repository..."
   sync_dotfiles_repo
 
   # 3. Verify & fix symlinks
-  info "Step 3/4: Verifying symlinks..."
+  info "Step 3/5: Verifying symlinks..."
   verify_and_fix_symlinks
 
   # 4. Verify tmux plugins
-  info "Step 4/4: Verifying tmux plugins..."
+  info "Step 4/5: Verifying tmux plugins..."
   verify_tmux_plugins
+
+  # 5. Verify nvim theme
+  info "Step 5/5: Verifying nvim theme..."
+  verify_nvim_theme
 
   echo ""
   echo "  ┌─────────────────────────────────┐"
