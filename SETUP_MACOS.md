@@ -25,8 +25,7 @@ brew install git tmux neovim
 ## Clone the Repository
 
 ```bash
-mkdir -p ~/tools
-git clone git@github.com:isuryanarayanan/dotfiles.git ~/tools/dotfiles
+git clone git@github.com:isuryanarayanan/dotfiles.git ~/dotfiles
 ```
 
 ## Tmux
@@ -36,7 +35,7 @@ git clone git@github.com:isuryanarayanan/dotfiles.git ~/tools/dotfiles
 This creates a symlink from `~/.tmux.conf` to the config in this repo. Any changes you make are automatically tracked.
 
 ```bash
-~/tools/dotfiles/tmux/setup_tmux.sh
+~/dotfiles/tmux/setup_tmux.sh
 ```
 
 If an existing `~/.tmux.conf` is found, it will be backed up to `~/.tmux.conf.bak`.
@@ -100,7 +99,7 @@ The `Alt + Arrow` pane navigation bindings send `M-Left`, `M-Right`, etc. In som
 This creates a symlink from `~/.config/nvim` to the config in this repo. Any changes you make are automatically tracked.
 
 ```bash
-~/tools/dotfiles/nvim/setup_nvim.sh
+~/dotfiles/nvim/setup_nvim.sh
 ```
 
 If an existing `~/.config/nvim` directory is found, it will be backed up to `~/.config/nvim.bak`.

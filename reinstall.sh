@@ -9,12 +9,12 @@ set -e
 # the remote dotfiles repo and reconciles any differences.
 #
 # Usage:
-#   ~/tools/dotfiles/reinstall.sh          (run locally)
+#   ~/dotfiles/reinstall.sh                (run locally)
 #   curl -fsSL https://raw.githubusercontent.com/isuryanarayanan/dotfiles/master/reinstall.sh | bash
 # ──────────────────────────────────────────────
 
 DOTFILES_REPO="https://github.com/isuryanarayanan/dotfiles.git"
-DOTFILES_DIR="$HOME/tools/dotfiles"
+DOTFILES_DIR="$HOME/dotfiles"
 
 # ── Helpers ───────────────────────────────────
 

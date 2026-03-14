@@ -9,7 +9,7 @@ set -e
 # ──────────────────────────────────────────────
 
 DOTFILES_REPO="https://github.com/isuryanarayanan/dotfiles.git"
-DOTFILES_DIR="$HOME/tools/dotfiles"
+DOTFILES_DIR="$HOME/dotfiles"
 
 # ── Helpers ───────────────────────────────────
 
