@@ -65,14 +65,14 @@ tmux set-environment -g TMUX_PLUGIN_MANAGER_PATH "$HOME/.tmux/plugins/"
 
 ### Key bindings
 
-| Binding | Action |
-|---------|--------|
-| `Ctrl-b v` | Vertical split |
-| `Ctrl-b h` | Horizontal split |
-| `Ctrl-b m` | Toggle pane zoom |
-| `Ctrl-b r` | Reload config |
-| `Alt + Arrow` | Navigate panes |
-| `Shift + Left/Right` | Cycle windows |
+| Binding              | Action           |
+| -------------------- | ---------------- |
+| `Ctrl-b v`           | Vertical split   |
+| `Ctrl-b h`           | Horizontal split |
+| `Ctrl-b m`           | Toggle pane zoom |
+| `Ctrl-b r`           | Reload config    |
+| `Alt + Arrow`        | Navigate panes   |
+| `Shift + Left/Right` | Cycle windows    |
 
 Mouse mode is enabled by default.
 
