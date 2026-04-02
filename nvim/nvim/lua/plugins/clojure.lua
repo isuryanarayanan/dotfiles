@@ -1,6 +1,6 @@
 -- Clojure development: REPL (Conjure), structural editing (paredit),
 -- treesitter, and ANSI colorization for the log buffer.
--- LSP is handled by clojure-lsp on $PATH (auto-detected by LazyVim).
+-- LSP is handled by clojure-lsp (configured in lsp.lua, installed via mason).
 -- Completion comes from clojure-lsp via blink.cmp (no extra config needed).
 return {
   -- Treesitter: add clojure parser

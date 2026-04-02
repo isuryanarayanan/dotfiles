@@ -73,7 +73,7 @@ install_packages_macos() {
   ok "Homebrew available"
 
   info "Installing packages via Homebrew..."
-  brew install git tmux neovim ripgrep fd node
+  brew install git tmux neovim ripgrep fd node starship fzf fd eza bat zoxide tlrc
   ok "Packages installed"
 }
 
@@ -248,6 +248,22 @@ setup_nvim_theme() {
   fi
 }
 
+# ── Zsh setup ─────────────────────────────────
+
+setup_zsh() {
+  info "Setting up zsh..."
+
+  local zsh_setup="$DOTFILES_DIR/zsh/setup_zsh.sh"
+
+  if [ ! -f "$zsh_setup" ]; then
+    warn "zsh/setup_zsh.sh not found, skipping zsh setup"
+    return
+  fi
+
+  bash "$zsh_setup"
+  ok "Zsh setup complete"
+}
+
 # ── Main ──────────────────────────────────────
 
 main() {
@@ -266,35 +282,40 @@ main() {
   echo ""
 
   # 1. Install packages
-  info "Step 1/4: Installing packages..."
+  info "Step 1/5: Installing packages..."
   case "$os" in
     macos) install_packages_macos ;;
     linux) install_packages_linux ;;
   esac
 
   # 1.5 Install tmux-sessionizer
-  info "Step 1.5/4: Installing tmux-sessionizer..."
+  info "Step 1.5/5: Installing tmux-sessionizer..."
   install_tmux_sessionizer
 
   # 2. Clone/update dotfiles repo
-  info "Step 2/4: Setting up dotfiles repository..."
+  info "Step 2/5: Setting up dotfiles repository..."
   setup_dotfiles_repo
 
   # 3. Tmux
-  info "Step 3/4: Setting up tmux..."
+  info "Step 3/5: Setting up tmux..."
   setup_tmux
 
   # 4. Neovim
-  info "Step 4/4: Setting up neovim..."
+  info "Step 4/5: Setting up neovim..."
   setup_nvim
+
+  # 5. Zsh
+  info "Step 5/5: Setting up zsh..."
+  setup_zsh
 
   echo ""
   echo "  ┌─────────────────────────────────┐"
   echo "  │       Setup complete!            │"
   echo "  │                                  │"
   echo "  │  Next steps:                     │"
-  echo "  │  1. Open tmux                    │"
-  echo "  │  2. Open nvim (plugins will      │"
+  echo "  │  1. Open a new terminal          │"
+  echo "  │  2. Open tmux                    │"
+  echo "  │  3. Open nvim (plugins will      │"
   echo "  │     install on first launch)     │"
   echo "  └─────────────────────────────────┘"
   echo ""

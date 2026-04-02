@@ -17,7 +17,7 @@ If not already installed:
 ### Install required packages
 
 ```bash
-brew install git tmux neovim
+brew install git tmux neovim ripgrep fd node starship fzf eza bat zoxide tlrc
 ```
 
 > Neovim 0.9+ is required for LazyVim. Homebrew typically ships the latest version.
@@ -125,12 +125,76 @@ Wait for the plugin installation to complete, then restart neovim.
 
 ### Dependencies
 
-Some LazyVim features require additional tools:
-
-```bash
-brew install ripgrep fd node
-```
+Some LazyVim features require additional tools (installed above with the prerequisite packages):
 
 - **ripgrep** -- fast search (used by Telescope/grep)
 - **fd** -- fast file finder
 - **node** -- required by some LSP servers
+
+## Zsh
+
+### 1. Run the setup script
+
+This installs zsh productivity tools and symlinks `~/.zshrc`, `~/.zshenv`, `~/.zprofile`, and `~/.config/starship.toml` to this repo.
+
+```bash
+~/dotfiles/zsh/setup_zsh.sh
+```
+
+Any existing files are backed up with a `.bak` suffix before being replaced.
+
+### 2. Open a new terminal
+
+zinit (the plugin manager) bootstraps itself and installs all plugins on the first shell launch. Open a new terminal window — you'll see a brief one-time install, then the shell is ready.
+
+### What's configured
+
+- **Prompt:** Starship — shows directory, git branch/status, language versions, command duration, and vi mode indicator
+- **Plugin manager:** zinit with turbo/lazy loading
+- **Plugins:**
+  - `fast-syntax-highlighting` -- colors commands as you type
+  - `zsh-autosuggestions` -- inline history suggestions (right arrow or `Ctrl+Space` to accept)
+  - `zsh-history-substring-search` -- up/down arrows (and `j`/`k` in normal mode) search history by prefix
+  - `fzf-tab` -- tab completion routed through fzf with live previews
+- **Tools:** fzf (Ctrl+R/T, Alt+C), eza (`ls`/`ll`/`la`/`lt`), bat (`cat`), zoxide (`z`), tlrc (`tldr`)
+- **Vi mode** with cursor shape switching, `v` to edit command in nvim
+- **NVM lazy-loading** -- nvm only initialises on first use of `node`/`npm`/`nvm`
+
+### Key bindings
+
+| Binding | Action |
+|---------|--------|
+| `Ctrl+R` | Fuzzy search shell history |
+| `Ctrl+T` | Fuzzy insert file path |
+| `Alt+C` | Fuzzy cd into directory |
+| `Ctrl+Space` | Accept autosuggestion |
+| `→` (in insert mode) | Accept autosuggestion |
+| `↑` / `↓` | History substring search |
+| `k` / `j` (normal mode) | History substring search |
+| `v` (normal mode) | Edit command in `$EDITOR` |
+| `Ctrl+E` | Edit command in `$EDITOR` |
+| `Esc` | Enter vi normal mode |
+
+### Useful aliases
+
+| Alias | Expands to |
+|-------|-----------|
+| `ll` | `eza -l --icons --git` |
+| `la` | `eza -la --icons --git` |
+| `lt` | `eza --tree --level=2 --icons` |
+| `cat` | `bat --paging=never` |
+| `z <dir>` | Jump to frecent directory (zoxide) |
+| `gs` | `git status` |
+| `gl` | `git log --oneline --graph --decorate` |
+| `dotfiles` | `cd ~/dotfiles` |
+| `zshrc` | Open `.zshrc` in `$EDITOR` |
+| `reload` | `source ~/.zshrc` |
+
+### Symlink map
+
+| System path | Repo file |
+|-------------|-----------|
+| `~/.zshrc` | `zsh/.zshrc` |
+| `~/.zshenv` | `zsh/.zshenv` |
+| `~/.zprofile` | `zsh/.zprofile` |
+| `~/.config/starship.toml` | `zsh/starship/starship.toml` |

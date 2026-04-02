@@ -63,8 +63,8 @@ detect_linux_distro() {
 
 # ── Check packages ────────────────────────────
 
-REQUIRED_CMDS_MACOS="git tmux nvim rg fd node cargo tmux-sessionizer"
-REQUIRED_CMDS_LINUX="git tmux nvim rg fd node"
+REQUIRED_CMDS_MACOS="git tmux nvim rg fd node cargo tmux-sessionizer starship fzf eza bat zoxide"
+REQUIRED_CMDS_LINUX="git tmux nvim rg fd node starship fzf"
 
 check_packages() {
   local os="$1"
@@ -108,15 +108,21 @@ install_missing_packages() {
       fi
 
       local brew_packages=""
-      command_exists git  || brew_packages="$brew_packages git"
-      command_exists tmux || brew_packages="$brew_packages tmux"
-      command_exists nvim || brew_packages="$brew_packages neovim"
-      command_exists rg   || brew_packages="$brew_packages ripgrep"
-      command_exists fd   || brew_packages="$brew_packages fd"
-      command_exists node || brew_packages="$brew_packages node"
+      command_exists git            || brew_packages="$brew_packages git"
+      command_exists tmux           || brew_packages="$brew_packages tmux"
+      command_exists nvim           || brew_packages="$brew_packages neovim"
+      command_exists rg             || brew_packages="$brew_packages ripgrep"
+      command_exists fd             || brew_packages="$brew_packages fd"
+      command_exists node           || brew_packages="$brew_packages node"
+      command_exists starship       || brew_packages="$brew_packages starship"
+      command_exists fzf            || brew_packages="$brew_packages fzf"
+      command_exists eza            || brew_packages="$brew_packages eza"
+      command_exists bat            || brew_packages="$brew_packages bat"
+      command_exists zoxide         || brew_packages="$brew_packages zoxide"
 
       if [ -n "$brew_packages" ]; then
         info "Installing missing Homebrew packages:$brew_packages"
+        # shellcheck disable=SC2086
         brew install $brew_packages
       fi
 
@@ -313,6 +319,27 @@ verify_and_fix_symlinks() {
     fix_symlink "nvim" "$DOTFILES_DIR/nvim/nvim" "$HOME/.config/nvim"
   fi
 
+  # Zsh
+  if ! check_symlink "zshrc" "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"; then
+    needs_fix=true
+    fix_symlink "zshrc" "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
+  fi
+
+  if ! check_symlink "zshenv" "$DOTFILES_DIR/zsh/.zshenv" "$HOME/.zshenv"; then
+    needs_fix=true
+    fix_symlink "zshenv" "$DOTFILES_DIR/zsh/.zshenv" "$HOME/.zshenv"
+  fi
+
+  if ! check_symlink "zprofile" "$DOTFILES_DIR/zsh/.zprofile" "$HOME/.zprofile"; then
+    needs_fix=true
+    fix_symlink "zprofile" "$DOTFILES_DIR/zsh/.zprofile" "$HOME/.zprofile"
+  fi
+
+  if ! check_symlink "starship.toml" "$DOTFILES_DIR/zsh/starship/starship.toml" "$HOME/.config/starship.toml"; then
+    needs_fix=true
+    fix_symlink "starship.toml" "$DOTFILES_DIR/zsh/starship/starship.toml" "$HOME/.config/starship.toml"
+  fi
+
   if [ "$needs_fix" = false ]; then
     ok "All symlinks correct"
   fi
@@ -389,29 +416,37 @@ main() {
   echo "  │       target: $os                │"
   echo "  └─────────────────────────────────┘"
   echo ""
-
   # 1. Check & install packages
-  info "Step 1/5: Checking installed packages..."
+  info "Step 1/6: Checking installed packages..."
   if ! check_packages "$os"; then
     install_missing_packages "$os"
     check_packages "$os" || warn "Some packages may still be missing"
   fi
 
   # 2. Sync dotfiles repo
-  info "Step 2/5: Syncing dotfiles repository..."
+  info "Step 2/6: Syncing dotfiles repository..."
   sync_dotfiles_repo
 
   # 3. Verify & fix symlinks
-  info "Step 3/5: Verifying symlinks..."
+  info "Step 3/6: Verifying symlinks..."
   verify_and_fix_symlinks
 
   # 4. Verify tmux plugins
-  info "Step 4/5: Verifying tmux plugins..."
+  info "Step 4/6: Verifying tmux plugins..."
   verify_tmux_plugins
 
   # 5. Verify nvim theme
-  info "Step 5/5: Verifying nvim theme..."
+  info "Step 5/6: Verifying nvim theme..."
   verify_nvim_theme
+
+  # 6. Verify zsh setup
+  info "Step 6/6: Verifying zsh setup..."
+  local zsh_setup="$DOTFILES_DIR/zsh/setup_zsh.sh"
+  if [ -f "$zsh_setup" ]; then
+    bash "$zsh_setup"
+  else
+    warn "zsh/setup_zsh.sh not found, skipping zsh verification"
+  fi
 
   echo ""
   echo "  ┌─────────────────────────────────┐"
@@ -419,6 +454,8 @@ main() {
   echo "  │                                  │"
   echo "  │  Your system is in sync with     │"
   echo "  │  the remote dotfiles repo.       │"
+  echo "  │  Open a new terminal to apply    │"
+  echo "  │  zsh changes.                    │"
   echo "  └─────────────────────────────────┘"
   echo ""
 }

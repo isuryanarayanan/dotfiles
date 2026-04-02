@@ -4,15 +4,14 @@ Guidelines for AI agents working in this dotfiles repository.
 
 ## Project Overview
 
-Personal dotfiles repo providing tmux and Neovim (LazyVim) configuration.
-Languages: **Bash** (setup scripts), **Lua** (Neovim config), **tmux conf**.
+Personal dotfiles repo providing tmux, Neovim (LazyVim), and zsh configuration.
+Languages: **Bash** (setup scripts), **Lua** (Neovim config), **Zsh** (shell config), **tmux conf**.
 No build system, no test suite, no CI/CD pipeline.
 
 **This repo is the single source of truth for the development environment.**
-Config files in this repo are symlinked into their system locations
-(`~/.config/nvim` and `~/.tmux.conf`). Every edit you make here is immediately
-live -- there is no deploy step, no copy, no sync. Treat every change as a
-production change to the running environment.
+Config files in this repo are symlinked into their system locations.
+Every edit you make here is immediately live -- there is no deploy step, no copy, no sync.
+Treat every change as a production change to the running environment.
 
 ## Repository Structure
 
@@ -32,6 +31,13 @@ dotfiles/
   tmux/
     setup_tmux.sh           # Symlinks ~/.tmux.conf -> repo
     .tmux.conf              # Tmux configuration
+  zsh/
+    setup_zsh.sh            # Installs tools and symlinks config files
+    .zshrc                  # Main shell config (zinit, plugins, aliases, vi mode)
+    .zshenv                 # Universal env vars (sourced for all zsh sessions)
+    .zprofile               # Login shell env (Homebrew shellenv)
+    starship/
+      starship.toml         # Starship prompt config
 ```
 
 ## Build / Lint / Test Commands
@@ -57,16 +63,17 @@ Shell scripts: lint with [ShellCheck](https://www.shellcheck.net/):
 
 ```bash
 # Lint all shell scripts
-shellcheck setup.sh reinstall.sh nvim/setup_nvim.sh tmux/setup_tmux.sh
+shellcheck setup.sh reinstall.sh nvim/setup_nvim.sh tmux/setup_tmux.sh zsh/setup_zsh.sh
 
 # Lint a single script
-shellcheck setup.sh
+shellcheck zsh/setup_zsh.sh
 ```
 
 ### Validating Changes
 
 - **Neovim config**: Open `nvim` and confirm no errors on startup; run `:checkhealth`
 - **Tmux config**: Run `tmux source-file ~/.tmux.conf` or press `prefix + r` inside tmux
+- **Zsh config**: Run `source ~/.zshrc` in a running shell, or open a new terminal
 - **Setup scripts**: Test with `bash -n <script>` for syntax checking before running
 
 ## Shell Script Conventions (Bash)
@@ -74,7 +81,7 @@ shellcheck setup.sh
 ### Structure and Safety
 - Shebang: always `#!/bin/bash`
 - Use `set -e` in orchestrator scripts (`setup.sh`, `reinstall.sh`)
-- Smaller helper scripts (`setup_nvim.sh`, `setup_tmux.sh`) use explicit `exit 1` instead
+- Smaller helper scripts (`setup_nvim.sh`, `setup_tmux.sh`, `setup_zsh.sh`) use explicit `exit 1` instead
 - Every script defines a `main()` function and calls `main "$@"` at the end
 
 ### Naming
@@ -158,6 +165,30 @@ return {
 ### Type Annotations
 - Use LuaCATS annotations where useful: `---@param`, `---@class`, `---@type`
 
+## Zsh Configuration
+
+### File responsibilities
+- `.zshenv` -- sourced for **all** zsh sessions (interactive, non-interactive, login, scripts). Keep minimal: only env vars that must be universally available (e.g. Cargo). No output, no slow operations.
+- `.zprofile` -- sourced once for **login** shells. Used for PATH/env setup that runs once (e.g. Homebrew shellenv).
+- `.zshrc` -- sourced for **interactive** shells. All plugins, aliases, keybindings, prompt, and functions go here.
+
+### Plugin manager: zinit
+- All plugins use turbo mode (`wait lucid`) for async loading
+- `fast-syntax-highlighting` must always be loaded **last** (it wraps all other ZLE widgets)
+- Keybindings for turbo-loaded plugins (e.g. `history-substring-search`, `autosuggest-accept`) must be set inside the plugin's `atload` hook -- never at top-level, or they will reference widgets that don't exist yet
+
+### Plugin load order (important)
+1. `zsh-completions` (blockf)
+2. `zsh-history-substring-search` (atload: bind ↑↓ and j/k)
+3. `zsh-autosuggestions` (atload: start + bind accept keys)
+4. `fzf-tab`
+5. `fast-syntax-highlighting` (last -- atinit: zicompinit)
+
+### Starship prompt
+- Config lives at `zsh/starship/starship.toml`
+- Symlinked to `~/.config/starship.toml`
+- Shows: directory, git branch/status, node/rust/lua/java/python versions, command duration, vi mode character
+
 ## Tmux Configuration
 
 - Plugin declarations: `set -g @plugin 'org/plugin-name'`
@@ -173,12 +204,9 @@ return {
 
 ## Architecture Decisions
 
-- **Symlink-based config**: Config files live in the repo; setup scripts create symlinks
-  from system paths (`~/.config/nvim`, `~/.tmux.conf`) to the repo
-- **One directory per tool**: `nvim/` and `tmux/` each contain a setup script and the
-  config files
-- **One plugin file per concern**: Each Lua file in `lua/plugins/` addresses a single
-  plugin or feature
+- **Symlink-based config**: Config files live in the repo; setup scripts create symlinks from system paths to the repo
+- **One directory per tool**: `nvim/`, `tmux/`, and `zsh/` each contain a setup script and the config files
+- **One plugin file per concern**: Each Lua file in `lua/plugins/` addresses a single plugin or feature
 - Edits to config files are automatically tracked by git because of symlinks
 
 ### Symlink Map
@@ -187,10 +215,15 @@ return {
 |---|---|
 | `~/.config/nvim` | `nvim/nvim/` |
 | `~/.tmux.conf` | `tmux/.tmux.conf` |
+| `~/.zshrc` | `zsh/.zshrc` |
+| `~/.zshenv` | `zsh/.zshenv` |
+| `~/.zprofile` | `zsh/.zprofile` |
+| `~/.config/starship.toml` | `zsh/starship/starship.toml` |
 
 Because of these symlinks, **any file you edit in this repo is the live config
 file the tool reads**. There is no build, no copy, no intermediate step. When
 you modify `nvim/nvim/lua/plugins/neo-tree.lua`, Neovim picks up the change on
 its next start. When you modify `tmux/.tmux.conf`, tmux picks it up on reload
-(`prefix + r`). Act accordingly: validate changes carefully and avoid leaving
-files in a broken state.
+(`prefix + r`). When you modify `zsh/.zshrc`, the change takes effect in new
+terminals (or after `source ~/.zshrc`). Act accordingly: validate changes carefully
+and avoid leaving files in a broken state.
