@@ -35,14 +35,15 @@ return {
   -- Conjure: interactive REPL evaluation
   {
     "Olical/conjure",
-    ft = { "clojure" },
+    ft = { "clojure", "markdown" },
     config = function(_, _)
       require("conjure.main").main()
       require("conjure.mapping")["on-filetype"]()
     end,
     init = function()
-      -- Only activate conjure for clojure filetypes
-      vim.g["conjure#filetypes"] = { "clojure" }
+      -- Activate Conjure for clojure forms in clojure and markdown buffers
+      vim.g["conjure#filetypes"] = { "clojure", "markdown" }
+      vim.g["conjure#filetype#markdown"] = "conjure.client.clojure.nrepl"
 
       -- Preserve ANSI escape sequences for baleia to colorize
       local has_baleia = pcall(require, "baleia")

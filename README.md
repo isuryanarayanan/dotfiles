@@ -1,6 +1,6 @@
 # dotfiles
 
-Configuration files for tmux, neovim, and zsh.
+Configuration files for tmux, neovim, zsh, and ghostty.
 
 ## One-liner setup
 
@@ -19,6 +19,7 @@ This will detect your OS (Linux or macOS), install dependencies, clone the repo,
 | **tmux** | Custom keybindings, mouse mode, TPM plugins (resurrect, continuum, yank, vim-tmux-navigator) | Symlink via `setup_tmux.sh` |
 | **neovim** | LazyVim-based Lua config with 14 colorschemes, transparency, theme hot-reload | Symlink via `setup_nvim.sh` |
 | **zsh** | zinit plugins, vi mode, starship prompt, aliases, fzf/eza/bat/zoxide integration | Symlink via `setup_zsh.sh` |
+| **ghostty** | Terminal colors (black-focused theme), cursor/selection palette | Config file at `ghostty/config` |
 
 All tools use symlinks, so any config edits are automatically tracked in the repo.
 
@@ -44,6 +45,8 @@ dotfiles/
 ├── tmux/
 │   ├── setup_tmux.sh          # Symlinks ~/.tmux.conf to this repo
 │   └── .tmux.conf
+├── ghostty/
+│   └── config                 # Ghostty terminal config
 └── zsh/
     ├── setup_zsh.sh           # Installs tools and symlinks config files
     ├── .zshrc                 # Main shell config (zinit, plugins, aliases, vi mode)
