@@ -248,6 +248,45 @@ setup_nvim_theme() {
   fi
 }
 
+# ── Ghostty setup ─────────────────────────────
+
+setup_ghostty() {
+  info "Setting up ghostty..."
+
+  local ghostty_source="$DOTFILES_DIR/ghostty/config"
+  local ghostty_target="$HOME/.config/ghostty/config"
+
+  if [ ! -f "$ghostty_source" ]; then
+    warn "ghostty/config not found in dotfiles, skipping ghostty setup"
+    return
+  fi
+
+  mkdir -p "$HOME/.config/ghostty"
+
+  if [ -L "$ghostty_target" ]; then
+    local current_link
+    current_link="$(readlink "$ghostty_target")"
+    if [ "$current_link" = "$ghostty_source" ]; then
+      ok "Ghostty symlink already correct"
+    else
+      warn "Existing symlink points to $current_link, replacing..."
+      rm "$ghostty_target"
+      ln -s "$ghostty_source" "$ghostty_target"
+      ok "Symlinked $ghostty_target -> $ghostty_source"
+    fi
+  elif [ -f "$ghostty_target" ]; then
+    warn "Existing ~/.config/ghostty/config found, backing up to ~/.config/ghostty/config.bak"
+    mv "$ghostty_target" "${ghostty_target}.bak"
+    ln -s "$ghostty_source" "$ghostty_target"
+    ok "Symlinked $ghostty_target -> $ghostty_source"
+  else
+    ln -s "$ghostty_source" "$ghostty_target"
+    ok "Symlinked $ghostty_target -> $ghostty_source"
+  fi
+
+  ok "Ghostty setup complete"
+}
+
 # ── Zsh setup ─────────────────────────────────
 
 setup_zsh() {
@@ -282,31 +321,35 @@ main() {
   echo ""
 
   # 1. Install packages
-  info "Step 1/5: Installing packages..."
+  info "Step 1/6: Installing packages..."
   case "$os" in
     macos) install_packages_macos ;;
     linux) install_packages_linux ;;
   esac
 
   # 1.5 Install tmux-sessionizer
-  info "Step 1.5/5: Installing tmux-sessionizer..."
+  info "Step 1.5/6: Installing tmux-sessionizer..."
   install_tmux_sessionizer
 
   # 2. Clone/update dotfiles repo
-  info "Step 2/5: Setting up dotfiles repository..."
+  info "Step 2/6: Setting up dotfiles repository..."
   setup_dotfiles_repo
 
   # 3. Tmux
-  info "Step 3/5: Setting up tmux..."
+  info "Step 3/6: Setting up tmux..."
   setup_tmux
 
   # 4. Neovim
-  info "Step 4/5: Setting up neovim..."
+  info "Step 4/6: Setting up neovim..."
   setup_nvim
 
   # 5. Zsh
-  info "Step 5/5: Setting up zsh..."
+  info "Step 5/6: Setting up zsh..."
   setup_zsh
+
+  # 6. Ghostty
+  info "Step 6/6: Setting up ghostty..."
+  setup_ghostty
 
   echo ""
   echo "  ┌─────────────────────────────────┐"

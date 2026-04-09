@@ -205,7 +205,7 @@ return {
 ## Architecture Decisions
 
 - **Symlink-based config**: Config files live in the repo; setup scripts create symlinks from system paths to the repo
-- **One directory per tool**: `nvim/`, `tmux/`, and `zsh/` each contain a setup script and the config files
+- **One directory per tool**: `nvim/`, `tmux/`, `zsh/`, and `ghostty/` each contain a setup script or config files
 - **One plugin file per concern**: Each Lua file in `lua/plugins/` addresses a single plugin or feature
 - Edits to config files are automatically tracked by git because of symlinks
 
@@ -219,6 +219,7 @@ return {
 | `~/.zshenv` | `zsh/.zshenv` |
 | `~/.zprofile` | `zsh/.zprofile` |
 | `~/.config/starship.toml` | `zsh/starship/starship.toml` |
+| `~/.config/ghostty/config` | `ghostty/config` |
 
 Because of these symlinks, **any file you edit in this repo is the live config
 file the tool reads**. There is no build, no copy, no intermediate step. When

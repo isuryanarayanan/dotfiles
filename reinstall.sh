@@ -340,6 +340,14 @@ verify_and_fix_symlinks() {
     fix_symlink "starship.toml" "$DOTFILES_DIR/zsh/starship/starship.toml" "$HOME/.config/starship.toml"
   fi
 
+  # Ghostty
+  if [ -f "$DOTFILES_DIR/ghostty/config" ]; then
+    if ! check_symlink "ghostty" "$DOTFILES_DIR/ghostty/config" "$HOME/.config/ghostty/config"; then
+      needs_fix=true
+      fix_symlink "ghostty" "$DOTFILES_DIR/ghostty/config" "$HOME/.config/ghostty/config"
+    fi
+  fi
+
   if [ "$needs_fix" = false ]; then
     ok "All symlinks correct"
   fi
