@@ -30,6 +30,20 @@ err()   { printf "\033[1;31m[error]\033[0m %s\n" "$1"; exit 1; }
 
 command_exists() { command -v "$1" >/dev/null 2>&1; }
 
+is_root() {
+  [ "${EUID:-$(id -u)}" -eq 0 ]
+}
+
+run_privileged() {
+  if is_root; then
+    "$@"
+  elif command_exists sudo; then
+    sudo "$@"
+  else
+    err "This step needs elevated privileges, but sudo is not available. Re-run as root or install sudo."
+  fi
+}
+
 detect_os() {
   case "$(uname -s)" in
     Linux*)  echo "linux" ;;
@@ -115,6 +129,7 @@ install_linux_tools() {
   distro="$1"
 
   local missing_tools=""
+  command_exists zsh      || missing_tools="$missing_tools zsh"
   command_exists starship || missing_tools="$missing_tools starship"
   command_exists fzf      || missing_tools="$missing_tools fzf"
   command_exists fd       || missing_tools="$missing_tools fd-find(fd)"
@@ -134,6 +149,11 @@ install_linux_tools() {
   info "  zoxide:   curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh"
   case "$distro" in
     debian)
+      if ! command_exists zsh; then
+        info "Installing zsh via apt..."
+        run_privileged apt update
+        run_privileged apt install -y zsh
+      fi
       info "  bat/fd/eza: sudo apt install bat fd-find && cargo install eza"
       ;;
     arch)
@@ -174,6 +194,32 @@ install_tools() {
   esac
 }
 
+# ── zinit ─────────────────────────────────────
+
+setup_zinit() {
+  if ! command_exists git; then
+    warn "git not installed, skipping zinit setup"
+    return
+  fi
+
+  local zinit_home="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+
+  if [ -f "$zinit_home/zinit.zsh" ]; then
+    ok "zinit already installed"
+    return
+  fi
+
+  if [ -e "$zinit_home" ]; then
+    warn "Incomplete zinit directory found at $zinit_home, replacing..."
+    rm -rf "$zinit_home"
+  fi
+
+  info "Installing zinit..."
+  mkdir -p "$(dirname "$zinit_home")"
+  git clone https://github.com/zdharma-continuum/zinit.git "$zinit_home"
+  ok "zinit installed"
+}
+
 # ── fzf key bindings ──────────────────────────
 
 setup_fzf() {
@@ -200,6 +246,32 @@ setup_fzf() {
   fi
 }
 
+# ── Default shell ─────────────────────────────
+
+setup_default_shell() {
+  if ! command_exists zsh; then
+    warn "zsh is not installed; cannot set it as the default shell"
+    return
+  fi
+
+  local zsh_path current_shell
+  zsh_path="$(command -v zsh)"
+  current_shell="$(getent passwd "${USER:-$(id -un)}" | cut -d: -f7 2>/dev/null || printf '%s' "${SHELL:-}")"
+
+  if [ "$current_shell" = "$zsh_path" ]; then
+    ok "Default shell already set to $zsh_path"
+    return
+  fi
+
+  info "Setting default shell to $zsh_path..."
+  if is_root; then
+    chsh -s "$zsh_path" "${USER:-$(id -un)}"
+  else
+    run_privileged chsh -s "$zsh_path" "${USER:-$(id -un)}"
+  fi
+  ok "Default shell set to $zsh_path (open a new WSL terminal to use it)"
+}
+
 # ── Symlinks ──────────────────────────────────
 
 setup_symlinks() {
@@ -218,21 +290,29 @@ setup_symlinks() {
 main() {
   echo ""
   echo "  ┌─────────────────────────────────┐"
-  echo "  │       zsh setup                  │"
+  echo "  │       zsh setup                 │"
   echo "  └─────────────────────────────────┘"
   echo ""
 
   # 1. Install tools
-  info "Step 1/3: Installing tools..."
+  info "Step 1/5: Installing tools..."
   install_tools
 
-  # 2. Set up fzf key bindings
-  info "Step 2/3: Setting up fzf..."
+  # 2. Set up zinit
+  info "Step 2/5: Setting up zinit..."
+  setup_zinit
+
+  # 3. Set up fzf key bindings
+  info "Step 3/5: Setting up fzf..."
   setup_fzf
 
-  # 3. Symlink config files
-  info "Step 3/3: Symlinking config files..."
+  # 4. Symlink config files
+  info "Step 4/5: Symlinking config files..."
   setup_symlinks
+
+  # 5. Set zsh as the default login shell
+  info "Step 5/5: Setting default shell..."
+  setup_default_shell
 
   echo ""
   ok "Zsh setup complete!"

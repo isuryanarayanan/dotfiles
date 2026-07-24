@@ -49,43 +49,46 @@ setopt COMBINING_CHARS        # handle combining unicode characters
 
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 
-if [[ ! -d "$ZINIT_HOME" ]]; then
+if [[ ! -f "${ZINIT_HOME}/zinit.zsh" ]]; then
+  rm -rf "$ZINIT_HOME"
   mkdir -p "$(dirname "$ZINIT_HOME")"
   git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
 fi
 
-source "${ZINIT_HOME}/zinit.zsh"
+if source "${ZINIT_HOME}/zinit.zsh"; then
+  # ── Plugins ───────────────────────────────────
 
-# ── Plugins ───────────────────────────────────
+  # Additional completions (load early so compinit sees them)
+  zinit ice wait lucid blockf atpull"zinit creinstall -q ."
+  zinit light zsh-users/zsh-completions
 
-# Additional completions (load early so compinit sees them)
-zinit ice wait lucid blockf atpull"zinit creinstall -q ."
-zinit light zsh-users/zsh-completions
+  # History substring search — bind keys in atload so the widget exists first
+  zinit ice wait lucid atload"
+    bindkey '^[[A' history-substring-search-up
+    bindkey '^[[B' history-substring-search-down
+    bindkey -M vicmd 'k' history-substring-search-up
+    bindkey -M vicmd 'j' history-substring-search-down
+  "
+  zinit light zsh-users/zsh-history-substring-search
 
-# History substring search — bind keys in atload so the widget exists first
-zinit ice wait lucid atload"
-  bindkey '^[[A' history-substring-search-up
-  bindkey '^[[B' history-substring-search-down
-  bindkey -M vicmd 'k' history-substring-search-up
-  bindkey -M vicmd 'j' history-substring-search-down
-"
-zinit light zsh-users/zsh-history-substring-search
+  # Autosuggestions — bind accept keys in atload so the widget exists first
+  zinit ice wait lucid atload"
+    _zsh_autosuggest_start
+    bindkey '^ ' autosuggest-accept
+    bindkey -M viins '^[[C' autosuggest-accept
+  "
+  zinit light zsh-users/zsh-autosuggestions
 
-# Autosuggestions — bind accept keys in atload so the widget exists first
-zinit ice wait lucid atload"
-  _zsh_autosuggest_start
-  bindkey '^ ' autosuggest-accept
-  bindkey -M viins '^[[C' autosuggest-accept
-"
-zinit light zsh-users/zsh-autosuggestions
+  # fzf-tab: replace zsh's default completion with fzf
+  zinit ice wait lucid
+  zinit light Aloxaf/fzf-tab
 
-# fzf-tab: replace zsh's default completion with fzf
-zinit ice wait lucid
-zinit light Aloxaf/fzf-tab
-
-# Syntax highlighting — must be last so it wraps all other widgets
-zinit ice wait lucid atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay"
-zinit light zdharma-continuum/fast-syntax-highlighting
+  # Syntax highlighting — must be last so it wraps all other widgets
+  zinit ice wait lucid atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay"
+  zinit light zdharma-continuum/fast-syntax-highlighting
+else
+  print -u2 "[zshrc] warning: failed to load zinit from ${ZINIT_HOME}/zinit.zsh"
+fi
 
 # ── fzf ───────────────────────────────────────
 
@@ -203,7 +206,7 @@ export PATH="$HOME/Library/Python/3.9/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
 # Lazy-load nvm: only initialise on first use of node/npm/nvm/npx
 _nvm_lazy_load() {
-  unset -f nvm node npm npx yarn pnpm
+  unset -f nvm node npm npx yarn pnpm pi
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 }
@@ -213,6 +216,7 @@ npm()  { _nvm_lazy_load; npm "$@"; }
 npx()  { _nvm_lazy_load; npx "$@"; }
 yarn() { _nvm_lazy_load; yarn "$@"; }
 pnpm() { _nvm_lazy_load; pnpm "$@"; }
+pi()   { _nvm_lazy_load; pi "$@"; }
 
 # ── Aliases: navigation ───────────────────────
 
@@ -227,12 +231,14 @@ if command -v eza >/dev/null 2>&1; then
   alias ls='eza --icons --group-directories-first'
   alias ll='eza --icons --group-directories-first -l --git'
   alias la='eza --icons --group-directories-first -la --git'
+  alias l='eza --icons --group-directories-first'
   alias lt='eza --icons --tree --level=2'
   alias lta='eza --icons --tree --level=2 -a'
 else
   alias ls='ls --color=auto'
   alias ll='ls -lh'
   alias la='ls -lah'
+  alias l='ls -CF'
 fi
 
 # ── Aliases: cat -> bat ───────────────────────
@@ -338,7 +344,9 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # Java (for Babashka/bbin)
 export JAVA_HOME="/opt/homebrew/Cellar/openjdk/25.0.2/libexec/openjdk.jdk/Contents/Home"
 export PATH="$JAVA_HOME/bin:$HOME/.local/bin:$PATH"
-export PATH="$PATH:$(go env GOPATH)/bin"
+if command -v go >/dev/null 2>&1; then
+  export PATH="$PATH:$(go env GOPATH)/bin"
+fi
 
 # Unifize bin
 export PATH="$HOME/Desktop/unifize/bin:$PATH"
@@ -347,7 +355,9 @@ export PATH="$HOME/Desktop/unifize/bin:$PATH"
 export GOOGLE_CLOUD_PROJECT="unifize-a5011"
 export GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/unifize/service-account.json"
 
-eval "$(viki shell init zsh)"
+if command -v viki >/dev/null 2>&1; then
+  eval "$(viki shell init zsh)"
+fi
 
 alias viki-mono='/opt/homebrew/bin/node /Users/apple/viki/.viki/labs/viki/viki-mono/packages/cli/bin/run.js'
 

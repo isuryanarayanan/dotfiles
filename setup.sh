@@ -77,6 +77,50 @@ install_packages_macos() {
   ok "Packages installed"
 }
 
+version_ge() {
+  [ "$(printf '%s\n%s\n' "$2" "$1" | sort -V | head -n1)" = "$2" ]
+}
+
+nvim_version_ok() {
+  if ! command_exists nvim; then
+    return 1
+  fi
+
+  local version
+  version="$(nvim --version | head -n1 | sed -E 's/^NVIM v?([0-9]+\.[0-9]+\.[0-9]+).*/\1/')"
+  version_ge "$version" "0.10.0"
+}
+
+install_latest_neovim_linux() {
+  if nvim_version_ok; then
+    ok "Neovim version is compatible: $(nvim --version | head -n1)"
+    return
+  fi
+
+  info "Installing latest Neovim to ~/.local/opt/nvim..."
+  local tmpdir archive
+  tmpdir="$(mktemp -d)"
+  archive="$tmpdir/nvim-linux-x86_64.tar.gz"
+
+  if command_exists curl; then
+    curl -fsSL -o "$archive" https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+  elif command_exists wget; then
+    wget -qO "$archive" https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+  else
+    err "Need curl or wget to install latest Neovim"
+  fi
+
+  mkdir -p "$HOME/.local/opt" "$HOME/.local/bin"
+  rm -rf "$HOME/.local/opt/nvim"
+  tar -xzf "$archive" -C "$tmpdir"
+  mv "$tmpdir/nvim-linux-x86_64" "$HOME/.local/opt/nvim"
+  ln -sf "$HOME/.local/opt/nvim/bin/nvim" "$HOME/.local/bin/nvim"
+  export PATH="$HOME/.local/bin:$PATH"
+  rm -rf "$tmpdir"
+
+  ok "Installed $(nvim --version | head -n1)"
+}
+
 install_tmux_sessionizer() {
   if command_exists tmux-sessionizer; then
     ok "tmux-sessionizer already installed"
@@ -103,21 +147,25 @@ install_packages_linux() {
     debian)
       info "Detected Debian/Ubuntu-based distro"
       run_privileged apt update
-      run_privileged apt install -y git tmux neovim ripgrep fd-find nodejs npm
+      run_privileged apt install -y git tmux neovim ripgrep fd-find nodejs npm zsh curl
       ;;
     arch)
       info "Detected Arch-based distro"
-      run_privileged pacman -Sy --noconfirm git tmux neovim ripgrep fd nodejs npm
+      run_privileged pacman -Sy --noconfirm git tmux neovim ripgrep fd nodejs npm zsh
       ;;
     fedora)
       info "Detected Fedora/RHEL-based distro"
-      run_privileged dnf install -y git tmux neovim ripgrep fd-find nodejs npm
+      run_privileged dnf install -y git tmux neovim ripgrep fd-find nodejs npm zsh
       ;;
     *)
       warn "Unknown Linux distro. Please install manually: git, tmux, neovim, ripgrep, fd, nodejs"
       warn "Continuing with setup assuming packages are present..."
       ;;
   esac
+  if [ "$distro" = "debian" ]; then
+    install_latest_neovim_linux
+  fi
+
   ok "Packages installed"
 }
 
