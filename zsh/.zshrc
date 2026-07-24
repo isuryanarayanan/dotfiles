@@ -195,6 +195,9 @@ export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
 # OpenCode
 export PATH="$HOME/.opencode/bin:$PATH"
 
+# Python user scripts (pip --user installs)
+export PATH="$HOME/Library/Python/3.9/bin:$PATH"
+
 # ── NVM (Node Version Manager) ────────────────
 
 export NVM_DIR="$HOME/.nvm"
@@ -331,3 +334,21 @@ fi
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Java (for Babashka/bbin)
+export JAVA_HOME="/opt/homebrew/Cellar/openjdk/25.0.2/libexec/openjdk.jdk/Contents/Home"
+export PATH="$JAVA_HOME/bin:$HOME/.local/bin:$PATH"
+export PATH="$PATH:$(go env GOPATH)/bin"
+
+# Unifize bin
+export PATH="$HOME/Desktop/unifize/bin:$PATH"
+
+# Google Cloud / Firebase
+export GOOGLE_CLOUD_PROJECT="unifize-a5011"
+export GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/unifize/service-account.json"
+
+eval "$(viki shell init zsh)"
+
+alias viki-mono='/opt/homebrew/bin/node /Users/apple/viki/.viki/labs/viki/viki-mono/packages/cli/bin/run.js'
+
+

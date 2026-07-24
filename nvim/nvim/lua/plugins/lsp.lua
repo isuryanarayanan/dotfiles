@@ -69,6 +69,7 @@ return {
         "yaml",
         "markdown",
         "markdown_inline",
+        "sql",
       })
     end,
   },

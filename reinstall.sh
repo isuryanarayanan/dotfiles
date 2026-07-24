@@ -425,35 +425,44 @@ main() {
   echo "  └─────────────────────────────────┘"
   echo ""
   # 1. Check & install packages
-  info "Step 1/6: Checking installed packages..."
+  info "Step 1/7: Checking installed packages..."
   if ! check_packages "$os"; then
     install_missing_packages "$os"
     check_packages "$os" || warn "Some packages may still be missing"
   fi
 
   # 2. Sync dotfiles repo
-  info "Step 2/6: Syncing dotfiles repository..."
+  info "Step 2/7: Syncing dotfiles repository..."
   sync_dotfiles_repo
 
   # 3. Verify & fix symlinks
-  info "Step 3/6: Verifying symlinks..."
+  info "Step 3/7: Verifying symlinks..."
   verify_and_fix_symlinks
 
   # 4. Verify tmux plugins
-  info "Step 4/6: Verifying tmux plugins..."
+  info "Step 4/7: Verifying tmux plugins..."
   verify_tmux_plugins
 
   # 5. Verify nvim theme
-  info "Step 5/6: Verifying nvim theme..."
+  info "Step 5/7: Verifying nvim theme..."
   verify_nvim_theme
 
   # 6. Verify zsh setup
-  info "Step 6/6: Verifying zsh setup..."
+  info "Step 6/7: Verifying zsh setup..."
   local zsh_setup="$DOTFILES_DIR/zsh/setup_zsh.sh"
   if [ -f "$zsh_setup" ]; then
     bash "$zsh_setup"
   else
     warn "zsh/setup_zsh.sh not found, skipping zsh verification"
+  fi
+
+  # 7. Verify custom scripts
+  info "Step 7/7: Verifying custom scripts..."
+  local scripts_setup="$DOTFILES_DIR/scripts/setup_scripts.sh"
+  if [ -f "$scripts_setup" ]; then
+    bash "$scripts_setup"
+  else
+    warn "scripts/setup_scripts.sh not found, skipping scripts verification"
   fi
 
   echo ""

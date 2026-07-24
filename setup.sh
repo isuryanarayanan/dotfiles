@@ -303,6 +303,22 @@ setup_zsh() {
   ok "Zsh setup complete"
 }
 
+# ── Scripts setup ──────────────────────────────
+
+setup_scripts() {
+  info "Setting up custom scripts..."
+
+  local scripts_setup="$DOTFILES_DIR/scripts/setup_scripts.sh"
+
+  if [ ! -f "$scripts_setup" ]; then
+    warn "scripts/setup_scripts.sh not found, skipping scripts setup"
+    return
+  fi
+
+  bash "$scripts_setup"
+  ok "Scripts setup complete"
+}
+
 # ── Main ──────────────────────────────────────
 
 main() {
@@ -321,7 +337,7 @@ main() {
   echo ""
 
   # 1. Install packages
-  info "Step 1/6: Installing packages..."
+  info "Step 1/7: Installing packages..."
   case "$os" in
     macos) install_packages_macos ;;
     linux) install_packages_linux ;;
@@ -332,24 +348,28 @@ main() {
   install_tmux_sessionizer
 
   # 2. Clone/update dotfiles repo
-  info "Step 2/6: Setting up dotfiles repository..."
+  info "Step 2/7: Setting up dotfiles repository..."
   setup_dotfiles_repo
 
   # 3. Tmux
-  info "Step 3/6: Setting up tmux..."
+  info "Step 3/7: Setting up tmux..."
   setup_tmux
 
   # 4. Neovim
-  info "Step 4/6: Setting up neovim..."
+  info "Step 4/7: Setting up neovim..."
   setup_nvim
 
   # 5. Zsh
-  info "Step 5/6: Setting up zsh..."
+  info "Step 5/7: Setting up zsh..."
   setup_zsh
 
   # 6. Ghostty
-  info "Step 6/6: Setting up ghostty..."
+  info "Step 6/7: Setting up ghostty..."
   setup_ghostty
+
+  # 7. Custom scripts
+  info "Step 7/7: Setting up custom scripts..."
+  setup_scripts
 
   echo ""
   echo "  ┌─────────────────────────────────┐"

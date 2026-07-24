@@ -4,4 +4,5 @@
 vim.g.maplocalleader = ","
 vim.opt.relativenumber = false
 vim.opt.conceallevel = 0
+vim.opt.wrap = true
 vim.g.autoformat = false

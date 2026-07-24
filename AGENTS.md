@@ -19,6 +19,9 @@ Treat every change as a production change to the running environment.
 dotfiles/
   setup.sh                  # Full bootstrap (designed for curl | bash)
   reinstall.sh              # Sync/reconcile existing install with remote
+  scripts/
+    setup_scripts.sh        # Symlinks scripts into ~/.local/bin
+    dictate.sh              # Local voice-to-text using whisper.cpp
   nvim/
     setup_nvim.sh           # Symlinks ~/.config/nvim -> repo
     nvim/                   # LazyVim config (symlink target)
@@ -219,6 +222,7 @@ return {
 | `~/.zshenv` | `zsh/.zshenv` |
 | `~/.zprofile` | `zsh/.zprofile` |
 | `~/.config/starship.toml` | `zsh/starship/starship.toml` |
+| `~/.local/bin/dictate` | `scripts/dictate.sh` |
 | `~/.config/ghostty/config` | `ghostty/config` |
 
 Because of these symlinks, **any file you edit in this repo is the live config

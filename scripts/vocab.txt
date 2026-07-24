@@ -1,0 +1,39 @@
+# ~/.config/dictate/vocab.txt
+# One term per line. These are passed to Whisper as an initial prompt
+# to bias transcription toward your domain vocabulary.
+# Lines starting with # are ignored.
+
+# Dotfiles & tools
+dotfiles
+tmux
+Neovim
+LazyVim
+zsh
+zinit
+Homebrew
+Starship
+
+# Dev tools
+git
+GitHub
+npm
+node
+Docker
+Kubernetes
+CLI
+API
+SSH
+YAML
+JSON
+TypeScript
+JavaScript
+Python
+Rust
+Lua
+Bash
+regex
+symlink
+config
+stdout
+stdin
+stderr
