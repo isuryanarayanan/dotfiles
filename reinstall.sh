@@ -192,14 +192,14 @@ install_missing_packages() {
       case "$distro" in
         debian)
           run_privileged apt update
-          run_privileged apt install -y git tmux neovim ripgrep fd-find nodejs npm zsh curl
+          run_privileged apt install -y git tmux neovim ripgrep fd-find nodejs npm zsh curl fzf
           install_latest_neovim_linux
           ;;
         arch)
-          run_privileged pacman -Sy --noconfirm git tmux neovim ripgrep fd nodejs npm zsh
+          run_privileged pacman -Sy --noconfirm git tmux neovim ripgrep fd nodejs npm zsh fzf
           ;;
         fedora)
-          run_privileged dnf install -y git tmux neovim ripgrep fd-find nodejs npm zsh
+          run_privileged dnf install -y git tmux neovim ripgrep fd-find nodejs npm zsh fzf
           ;;
         *)
           warn "Unknown distro. Please install missing packages manually."
@@ -457,6 +457,22 @@ verify_nvim_theme() {
   fi
 }
 
+# ── Pi setup ─────────────────────────────────
+
+setup_pi() {
+  info "Setting up Pi..."
+
+  local pi_setup="$DOTFILES_DIR/.pi/setup_pi.sh"
+
+  if [ ! -f "$pi_setup" ]; then
+    warn ".pi/setup_pi.sh not found, skipping Pi setup"
+    return
+  fi
+
+  bash "$pi_setup"
+  ok "Pi setup complete"
+}
+
 # ── Main ──────────────────────────────────────
 
 main() {
@@ -474,30 +490,30 @@ main() {
   echo "  └─────────────────────────────────┘"
   echo ""
   # 1. Check & install packages
-  info "Step 1/7: Checking installed packages..."
+  info "Step 1/8: Checking installed packages..."
   if ! check_packages "$os"; then
     install_missing_packages "$os"
     check_packages "$os" || warn "Some packages may still be missing"
   fi
 
   # 2. Sync dotfiles repo
-  info "Step 2/7: Syncing dotfiles repository..."
+  info "Step 2/8: Syncing dotfiles repository..."
   sync_dotfiles_repo
 
   # 3. Verify & fix symlinks
-  info "Step 3/7: Verifying symlinks..."
+  info "Step 3/8: Verifying symlinks..."
   verify_and_fix_symlinks
 
   # 4. Verify tmux plugins
-  info "Step 4/7: Verifying tmux plugins..."
+  info "Step 4/8: Verifying tmux plugins..."
   verify_tmux_plugins
 
   # 5. Verify nvim theme
-  info "Step 5/7: Verifying nvim theme..."
+  info "Step 5/8: Verifying nvim theme..."
   verify_nvim_theme
 
   # 6. Verify zsh setup
-  info "Step 6/7: Verifying zsh setup..."
+  info "Step 6/8: Verifying zsh setup..."
   local zsh_setup="$DOTFILES_DIR/zsh/setup_zsh.sh"
   if [ -f "$zsh_setup" ]; then
     bash "$zsh_setup"
@@ -506,13 +522,17 @@ main() {
   fi
 
   # 7. Verify custom scripts
-  info "Step 7/7: Verifying custom scripts..."
+  info "Step 7/8: Verifying custom scripts..."
   local scripts_setup="$DOTFILES_DIR/scripts/setup_scripts.sh"
   if [ -f "$scripts_setup" ]; then
     bash "$scripts_setup"
   else
     warn "scripts/setup_scripts.sh not found, skipping scripts verification"
   fi
+
+  # 8. Verify Pi setup
+  info "Step 8/8: Verifying Pi setup..."
+  setup_pi
 
   echo ""
   echo "  ┌─────────────────────────────────┐"

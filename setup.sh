@@ -147,15 +147,15 @@ install_packages_linux() {
     debian)
       info "Detected Debian/Ubuntu-based distro"
       run_privileged apt update
-      run_privileged apt install -y git tmux neovim ripgrep fd-find nodejs npm zsh curl
+      run_privileged apt install -y git tmux neovim ripgrep fd-find nodejs npm zsh curl fzf
       ;;
     arch)
       info "Detected Arch-based distro"
-      run_privileged pacman -Sy --noconfirm git tmux neovim ripgrep fd nodejs npm zsh
+      run_privileged pacman -Sy --noconfirm git tmux neovim ripgrep fd nodejs npm zsh fzf
       ;;
     fedora)
       info "Detected Fedora/RHEL-based distro"
-      run_privileged dnf install -y git tmux neovim ripgrep fd-find nodejs npm zsh
+      run_privileged dnf install -y git tmux neovim ripgrep fd-find nodejs npm zsh fzf
       ;;
     *)
       warn "Unknown Linux distro. Please install manually: git, tmux, neovim, ripgrep, fd, nodejs"
@@ -367,6 +367,22 @@ setup_scripts() {
   ok "Scripts setup complete"
 }
 
+# ── Pi setup ─────────────────────────────────
+
+setup_pi() {
+  info "Setting up Pi..."
+
+  local pi_setup="$DOTFILES_DIR/.pi/setup_pi.sh"
+
+  if [ ! -f "$pi_setup" ]; then
+    warn ".pi/setup_pi.sh not found, skipping Pi setup"
+    return
+  fi
+
+  bash "$pi_setup"
+  ok "Pi setup complete"
+}
+
 # ── Main ──────────────────────────────────────
 
 main() {
@@ -385,39 +401,43 @@ main() {
   echo ""
 
   # 1. Install packages
-  info "Step 1/7: Installing packages..."
+  info "Step 1/8: Installing packages..."
   case "$os" in
     macos) install_packages_macos ;;
     linux) install_packages_linux ;;
   esac
 
   # 1.5 Install tmux-sessionizer
-  info "Step 1.5/6: Installing tmux-sessionizer..."
+  info "Step 1.5/8: Installing tmux-sessionizer..."
   install_tmux_sessionizer
 
   # 2. Clone/update dotfiles repo
-  info "Step 2/7: Setting up dotfiles repository..."
+  info "Step 2/8: Setting up dotfiles repository..."
   setup_dotfiles_repo
 
   # 3. Tmux
-  info "Step 3/7: Setting up tmux..."
+  info "Step 3/8: Setting up tmux..."
   setup_tmux
 
   # 4. Neovim
-  info "Step 4/7: Setting up neovim..."
+  info "Step 4/8: Setting up neovim..."
   setup_nvim
 
   # 5. Zsh
-  info "Step 5/7: Setting up zsh..."
+  info "Step 5/8: Setting up zsh..."
   setup_zsh
 
   # 6. Ghostty
-  info "Step 6/7: Setting up ghostty..."
+  info "Step 6/8: Setting up ghostty..."
   setup_ghostty
 
   # 7. Custom scripts
-  info "Step 7/7: Setting up custom scripts..."
+  info "Step 7/8: Setting up custom scripts..."
   setup_scripts
+
+  # 8. Pi
+  info "Step 8/8: Setting up Pi..."
+  setup_pi
 
   echo ""
   echo "  ┌─────────────────────────────────┐"
@@ -428,6 +448,7 @@ main() {
   echo "  │  2. Open tmux                    │"
   echo "  │  3. Open nvim (plugins will      │"
   echo "  │     install on first launch)     │"
+  echo "  │  4. Run pi and /login if needed  │"
   echo "  └─────────────────────────────────┘"
   echo ""
 }

@@ -1,6 +1,6 @@
 # dotfiles
 
-Configuration files for tmux, neovim, zsh, and ghostty.
+Configuration files for tmux, neovim, zsh, ghostty, and Pi.
 
 ## One-liner setup
 
@@ -8,18 +8,19 @@ Configuration files for tmux, neovim, zsh, and ghostty.
 curl -fsSL https://raw.githubusercontent.com/isuryanarayanan/dotfiles/master/setup.sh | bash
 ```
 
-This will detect your OS (Linux or macOS), install dependencies, clone the repo, and set up tmux, neovim, and zsh.
+This will detect your OS (Linux or macOS), install dependencies, clone the repo, and set up tmux, neovim, zsh, ghostty, custom scripts, and Pi.
 
 > On macOS, run it as your normal user (not with `sudo`) because Homebrew does not allow root execution.
 
 ## What's included
 
-| Tool | Config | Setup method |
-|------|--------|--------------|
-| **tmux** | Custom keybindings, mouse mode, TPM plugins (resurrect, continuum, yank, vim-tmux-navigator) | Symlink via `setup_tmux.sh` |
-| **neovim** | LazyVim-based Lua config with 14 colorschemes, transparency, theme hot-reload | Symlink via `setup_nvim.sh` |
-| **zsh** | zinit plugins, vi mode, starship prompt, aliases, fzf/eza/bat/zoxide integration | Symlink via `setup_zsh.sh` |
-| **ghostty** | Terminal colors (black-focused theme), cursor/selection palette | Config file at `ghostty/config` |
+| Tool        | Config                                                                                       | Setup method                                               |
+| ----------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| **tmux**    | Custom keybindings, mouse mode, TPM plugins (resurrect, continuum, yank, vim-tmux-navigator) | Symlink via `setup_tmux.sh`                                |
+| **neovim**  | LazyVim-based Lua config with 14 colorschemes, transparency, theme hot-reload                | Symlink via `setup_nvim.sh`                                |
+| **zsh**     | zinit plugins, vi mode, starship prompt, aliases, fzf/eza/bat/zoxide integration             | Symlink via `setup_zsh.sh`                                 |
+| **ghostty** | Terminal colors (black-focused theme), cursor/selection palette                              | Config file at `ghostty/config`                            |
+| **pi**      | Pi coding agent defaults plus `web_search` and `web_fetch` tools                             | Symlink `~/.pi/agent/settings.json` -> `.pi/settings.json` |
 
 All tools use symlinks, so any config edits are automatically tracked in the repo.
 
@@ -47,6 +48,11 @@ dotfiles/
 │   └── .tmux.conf
 ├── ghostty/
 │   └── config                 # Ghostty terminal config
+├── .pi/
+│   ├── setup_pi.sh            # Installs Pi and symlinks settings
+│   ├── settings.json          # Managed Pi settings
+│   └── extensions/
+│       └── web.ts             # web_search and web_fetch tools
 └── zsh/
     ├── setup_zsh.sh           # Installs tools and symlinks config files
     ├── .zshrc                 # Main shell config (zinit, plugins, aliases, vi mode)
