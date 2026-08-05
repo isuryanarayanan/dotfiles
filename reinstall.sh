@@ -196,7 +196,7 @@ install_missing_packages() {
           install_latest_neovim_linux
           ;;
         arch)
-          run_privileged pacman -Sy --noconfirm git tmux neovim ripgrep fd nodejs npm zsh fzf
+          run_privileged pacman -Syu --needed --noconfirm git tmux neovim ripgrep fd nodejs npm zsh fzf
           ;;
         fedora)
           run_privileged dnf install -y git tmux neovim ripgrep fd-find nodejs npm zsh fzf

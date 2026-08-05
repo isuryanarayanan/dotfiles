@@ -151,7 +151,7 @@ install_packages_linux() {
       ;;
     arch)
       info "Detected Arch-based distro"
-      run_privileged pacman -Sy --noconfirm git tmux neovim ripgrep fd nodejs npm zsh fzf
+      run_privileged pacman -Syu --needed --noconfirm git tmux neovim ripgrep fd nodejs npm zsh fzf
       ;;
     fedora)
       info "Detected Fedora/RHEL-based distro"
