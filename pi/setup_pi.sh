@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ──────────────────────────────────────────────
-# .pi/setup_pi.sh
+# pi/setup_pi.sh
 #
 # Installs the Pi coding agent and symlinks the managed Pi settings file
 # (~/.pi/agent/settings.json) into the repo.

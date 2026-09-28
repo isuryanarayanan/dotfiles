@@ -20,7 +20,7 @@ This will detect your OS (Linux or macOS), install dependencies, clone the repo,
 | **neovim**  | LazyVim-based Lua config with 14 colorschemes, transparency, theme hot-reload                | Symlink via `setup_nvim.sh`                                |
 | **zsh**     | zinit plugins, vi mode, starship prompt, aliases, fzf/eza/bat/zoxide integration             | Symlink via `setup_zsh.sh`                                 |
 | **ghostty** | Terminal colors (black-focused theme), cursor/selection palette                              | Config file at `ghostty/config`                            |
-| **pi**      | Pi coding agent defaults plus `web_search` and `web_fetch` tools                             | Symlink `~/.pi/agent/settings.json` -> `.pi/settings.json` |
+| **pi**      | Pi coding agent defaults plus web tools and input suggestions                                | Symlink `~/.pi/agent/settings.json` -> `pi/settings.json` |
 
 All tools use symlinks, so any config edits are automatically tracked in the repo.
 
@@ -48,10 +48,11 @@ dotfiles/
 │   └── .tmux.conf
 ├── ghostty/
 │   └── config                 # Ghostty terminal config
-├── .pi/
+├── pi/
 │   ├── setup_pi.sh            # Installs Pi and symlinks settings
 │   ├── settings.json          # Managed Pi settings
 │   └── extensions/
+│       ├── input-suggestions.ts # Pi input suggestion helper
 │       └── web.ts             # web_search and web_fetch tools
 └── zsh/
     ├── setup_zsh.sh           # Installs tools and symlinks config files

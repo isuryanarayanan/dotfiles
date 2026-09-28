@@ -8,7 +8,7 @@
   "collapseChangelog": true,
   "enableInstallTelemetry": false,
   "extensions": [
-    "~/dotfiles/.pi/extensions"
+    "~/dotfiles/pi/extensions"
   ],
   "enabledModels": [
     "gpt-5.5",

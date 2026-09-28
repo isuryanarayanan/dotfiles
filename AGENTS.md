@@ -11,7 +11,7 @@ Guidelines for AI agents working in this dotfiles repository.
    - Zsh: `zsh/setup_zsh.sh`, then `zsh/.zshenv`, `zsh/.zprofile`, `zsh/.zshrc`
    - Tmux: `tmux/setup_tmux.sh`, then `tmux/.tmux.conf`
    - Ghostty: `ghostty/config`
-   - Pi: `.pi/setup_pi.sh`, `.pi/settings.json`, `.pi/extensions/`
+   - Pi: `pi/setup_pi.sh`, `pi/settings.json`, `pi/extensions/`
 3. Prefer small, targeted edits. Validate syntax after touching scripts or Lua.
 4. Do not edit generated/local machine-specific files unless explicitly asked, especially `nvim/nvim/lua/plugins/theme.lua`.
 
@@ -46,7 +46,7 @@ dotfiles/
   setup.sh                  # Full bootstrap, designed for curl | bash
   reinstall.sh              # Sync/reconcile an existing install with remote
 
-  .pi/
+  pi/
     setup_pi.sh             # Installs Pi and symlinks ~/.pi/agent/settings.json
     settings.json           # Managed Pi settings
     extensions/
@@ -105,8 +105,8 @@ Use this order when trying to understand behavior:
    - `.zprofile` is login-shell setup.
    - `.zshrc` contains interactive plugins, aliases, keybindings, prompt setup.
 6. **Pi**:
-   - `.pi/settings.json` is symlinked to `~/.pi/agent/settings.json`.
-   - `.pi/extensions/` contains custom Pi tools loaded by settings.
+   - `pi/settings.json` is symlinked to `~/.pi/agent/settings.json`.
+   - `pi/extensions/` contains custom Pi tools loaded by settings.
 
 ## Build / Lint / Test Commands
 
@@ -130,10 +130,10 @@ Shell scripts:
 
 ```bash
 # Syntax-check all shell scripts
-bash -n setup.sh reinstall.sh .pi/setup_pi.sh nvim/setup_nvim.sh tmux/setup_tmux.sh zsh/setup_zsh.sh scripts/setup_scripts.sh scripts/dictate.sh
+bash -n setup.sh reinstall.sh pi/setup_pi.sh nvim/setup_nvim.sh tmux/setup_tmux.sh zsh/setup_zsh.sh scripts/setup_scripts.sh scripts/dictate.sh
 
 # Lint all shell scripts when shellcheck is available
-shellcheck setup.sh reinstall.sh .pi/setup_pi.sh nvim/setup_nvim.sh tmux/setup_tmux.sh zsh/setup_zsh.sh scripts/setup_scripts.sh scripts/dictate.sh
+shellcheck setup.sh reinstall.sh pi/setup_pi.sh nvim/setup_nvim.sh tmux/setup_tmux.sh zsh/setup_zsh.sh scripts/setup_scripts.sh scripts/dictate.sh
 ```
 
 Lua / Neovim:
@@ -150,7 +150,7 @@ nvim --headless '+quit'
 - **Tmux config**: Run `tmux source-file ~/.tmux.conf` or press `prefix + r` inside tmux.
 - **Zsh config**: Run `source ~/.zshrc` in a running interactive shell, or open a new terminal.
 - **Setup scripts**: Run `bash -n <script>` before executing.
-- **Pi config**: Restart/reload Pi after changing `.pi/settings.json` or `.pi/extensions/`.
+- **Pi config**: Restart/reload Pi after changing `pi/settings.json` or `pi/extensions/`.
 
 ## Shell Script Conventions (Bash)
 
@@ -291,9 +291,9 @@ Use LuaCATS annotations where useful: `---@param`, `---@class`, `---@type`.
 
 ## Pi Configuration
 
-- Managed settings live at `.pi/settings.json`.
+- Managed settings live at `pi/settings.json`.
 - System settings path is `~/.pi/agent/settings.json`, symlinked to the repo file.
-- Custom extensions live in `.pi/extensions/` and are referenced by `.pi/settings.json`.
+- Custom extensions live in `pi/extensions/` and are referenced by `pi/settings.json`.
 - Auth/session/model store files under `~/.pi/agent/` are local machine state and are not managed by this repo.
 
 ## Machine-Specific Files
@@ -306,7 +306,7 @@ Use LuaCATS annotations where useful: `---@param`, `---@class`, `---@type`.
 ## Architecture Decisions
 
 - **Symlink-based config**: Config files live in the repo; setup scripts create symlinks from system paths to repo paths.
-- **One directory per tool**: `nvim/`, `tmux/`, `zsh/`, `ghostty/`, `.pi/`, and `scripts/` group related files.
+- **One directory per tool**: `nvim/`, `tmux/`, `zsh/`, `ghostty/`, `pi/`, and `scripts/` group related files.
 - **One plugin file per concern**: Each Lua file in `lua/plugins/` addresses a plugin or feature.
 - **Self-contained setup scripts**: Repeated helper code is intentional for standalone bootstrap reliability.
 
@@ -322,6 +322,6 @@ Use LuaCATS annotations where useful: `---@param`, `---@class`, `---@type`.
 | `~/.config/starship.toml`   | `zsh/starship/starship.toml` |
 | `~/.local/bin/dictate`      | `scripts/dictate.sh`         |
 | `~/.config/ghostty/config`  | `ghostty/config`             |
-| `~/.pi/agent/settings.json` | `.pi/settings.json`          |
+| `~/.pi/agent/settings.json` | `pi/settings.json`           |
 
 Because of these symlinks, any edit to the repo target is usually a live configuration change. Validate carefully and avoid leaving files in a broken state.

@@ -362,3 +362,7 @@ fi
 alias viki-mono='/opt/homebrew/bin/node /Users/apple/viki/.viki/labs/viki/viki-mono/packages/cli/bin/run.js'
 
 
+
+# >>> viki shell integration >>>
+eval "$(viki shell init zsh)"
+# <<< viki shell integration <<<

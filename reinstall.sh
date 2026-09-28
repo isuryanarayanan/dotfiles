@@ -462,10 +462,10 @@ verify_nvim_theme() {
 setup_pi() {
   info "Setting up Pi..."
 
-  local pi_setup="$DOTFILES_DIR/.pi/setup_pi.sh"
+  local pi_setup="$DOTFILES_DIR/pi/setup_pi.sh"
 
   if [ ! -f "$pi_setup" ]; then
-    warn ".pi/setup_pi.sh not found, skipping Pi setup"
+    warn "pi/setup_pi.sh not found, skipping Pi setup"
     return
   fi
 

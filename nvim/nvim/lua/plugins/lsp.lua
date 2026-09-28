@@ -20,7 +20,13 @@ return {
         basedpyright = {},
 
         -- Go
-        gopls = {},
+        gopls = {
+          settings = {
+            gopls = {
+              buildFlags = { "-tags=unit" },
+            },
+          },
+        },
 
         -- Lua (Neovim config, etc.)
         lua_ls = {},
