@@ -46,11 +46,18 @@ dotfiles/
   setup.sh                  # Full bootstrap, designed for curl | bash
   reinstall.sh              # Sync/reconcile an existing install with remote
 
+  agents/
+    .skill-lock.json        # Shared skill installation metadata
+    skills/                 # Skills shared across agent harnesses
+
   pi/
-    setup_pi.sh             # Installs Pi and symlinks ~/.pi/agent/settings.json
-    settings.json           # Managed Pi settings
-    extensions/
-      web.ts                # web_search and web_fetch Pi tools
+    setup_pi.sh             # Installs Pi, creates managed links, restores packages
+    settings.json           # Preferences and Pi package declarations
+    keybindings.json        # Managed Pi keybindings
+    extensions/             # Personal extensions and extension configuration
+    skills/                 # Pi-specific global skills
+    prompts/                # Global prompt templates
+    themes/                 # Global custom themes
 
   ghostty/
     config                  # Ghostty terminal config
@@ -105,8 +112,10 @@ Use this order when trying to understand behavior:
    - `.zprofile` is login-shell setup.
    - `.zshrc` contains interactive plugins, aliases, keybindings, prompt setup.
 6. **Pi**:
-   - `pi/settings.json` is symlinked to `~/.pi/agent/settings.json`.
-   - `pi/extensions/` contains custom Pi tools loaded by settings.
+   - Managed files and resource directories under `pi/` are symlinked into `~/.pi/agent/`.
+   - Shared cross-agent skills live under `agents/`; Pi-specific skills live under `pi/skills/`.
+   - Package declarations are tracked in `pi/settings.json`; installed npm contents remain local.
+   - Auth, sessions, trust decisions, caches, and other runtime state remain machine-local.
 
 ## Build / Lint / Test Commands
 
@@ -291,10 +300,13 @@ Use LuaCATS annotations where useful: `---@param`, `---@class`, `---@type`.
 
 ## Pi Configuration
 
-- Managed settings live at `pi/settings.json`.
-- System settings path is `~/.pi/agent/settings.json`, symlinked to the repo file.
-- Custom extensions live in `pi/extensions/` and are referenced by `pi/settings.json`.
-- Auth/session/model store files under `~/.pi/agent/` are local machine state and are not managed by this repo.
+- Managed settings, keybindings, extensions, skills, prompts, and themes live under `pi/`.
+- Their corresponding paths under `~/.pi/agent/` are symlinked to the repo.
+- Third-party package declarations are tracked in `pi/settings.json`; `~/.pi/agent/npm/` is a generated local cache.
+- Auth, sessions, trust decisions, model stores, temporary files, and other runtime state are not managed by this repo.
+- Avoid duplicating capabilities already supplied by declared Pi packages such as Viki.
+- Do not copy skills already discovered from `~/.agents/skills/` into `pi/skills/`; duplicate names cause collisions.
+- Link only dotfiles-managed entries under `~/.agents/skills/` so externally managed entries such as `twg*` remain untouched.
 
 ## Machine-Specific Files
 
@@ -323,5 +335,13 @@ Use LuaCATS annotations where useful: `---@param`, `---@class`, `---@type`.
 | `~/.local/bin/dictate`      | `scripts/dictate.sh`         |
 | `~/.config/ghostty/config`  | `ghostty/config`             |
 | `~/.pi/agent/settings.json` | `pi/settings.json`           |
+| `~/.pi/agent/keybindings.json` | `pi/keybindings.json`      |
+| `~/.pi/agent/extensions`    | `pi/extensions/`              |
+| `~/.pi/agent/skills`        | `pi/skills/`                  |
+| `~/.pi/agent/prompts`       | `pi/prompts/`                 |
+| `~/.pi/agent/themes`        | `pi/themes/`                  |
+| `~/.agents/.skill-lock.json` | `agents/.skill-lock.json`    |
+| `~/.agents/skills/find-skills` | `agents/skills/find-skills/` |
+| `~/.agents/skills/grill-me` | `agents/skills/grill-me/`     |
 
 Because of these symlinks, any edit to the repo target is usually a live configuration change. Validate carefully and avoid leaving files in a broken state.

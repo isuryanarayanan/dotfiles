@@ -1,0 +1,10 @@
+{
+  "enabled": true,
+  "beepOnSettled": true,
+  "beepOnQuestion": true,
+  "minRunMs": 15000,
+  "frequencyHz": 880,
+  "shortMs": 140,
+  "longMs": 350,
+  "volumePct": 20
+}

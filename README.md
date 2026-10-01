@@ -20,9 +20,9 @@ This will detect your OS (Linux or macOS), install dependencies, clone the repo,
 | **neovim**  | LazyVim-based Lua config with 14 colorschemes, transparency, theme hot-reload                | Symlink via `setup_nvim.sh`                                |
 | **zsh**     | zinit plugins, vi mode, starship prompt, aliases, fzf/eza/bat/zoxide integration             | Symlink via `setup_zsh.sh`                                 |
 | **ghostty** | Terminal colors (black-focused theme), cursor/selection palette                              | Config file at `ghostty/config`                            |
-| **pi**      | Pi coding agent defaults plus web tools and input suggestions                                | Symlink `~/.pi/agent/settings.json` -> `pi/settings.json` |
+| **pi**      | Pi settings, personal extensions, skills, prompts, and themes                               | Symlink managed `~/.pi/agent/` paths into `pi/`           |
 
-All tools use symlinks, so any config edits are automatically tracked in the repo.
+All tools use symlinks, so managed config edits are automatically tracked in the repo. Shared cross-agent skills live under `agents/`, while Pi-specific skills live under `pi/skills/`. Pi credentials, sessions, trust decisions, model caches, and installed npm dependencies remain local under `~/.pi/agent/`.
 
 ## Platform guides
 
@@ -48,12 +48,17 @@ dotfiles/
 │   └── .tmux.conf
 ├── ghostty/
 │   └── config                 # Ghostty terminal config
+├── agents/
+│   ├── .skill-lock.json       # Shared skill installation metadata
+│   └── skills/                # Skills shared across agent harnesses
 ├── pi/
-│   ├── setup_pi.sh            # Installs Pi and symlinks settings
-│   ├── settings.json          # Managed Pi settings
-│   └── extensions/
-│       ├── input-suggestions.ts # Pi input suggestion helper
-│       └── web.ts             # web_search and web_fetch tools
+│   ├── setup_pi.sh            # Installs Pi, creates links, and restores packages
+│   ├── settings.json          # Preferences and Pi package declarations
+│   ├── keybindings.json       # Managed Pi keybindings
+│   ├── extensions/            # Personal extensions and extension config
+│   ├── skills/                # Pi-specific global skills
+│   ├── prompts/               # Global prompt templates
+│   └── themes/                # Global custom themes
 └── zsh/
     ├── setup_zsh.sh           # Installs tools and symlinks config files
     ├── .zshrc                 # Main shell config (zinit, plugins, aliases, vi mode)

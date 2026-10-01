@@ -3,16 +3,35 @@
 # ──────────────────────────────────────────────
 # pi/setup_pi.sh
 #
-# Installs the Pi coding agent and symlinks the managed Pi settings file
-# (~/.pi/agent/settings.json) into the repo.
+# Installs the Pi coding agent, symlinks managed configuration and resource
+# directories into the repo, and restores declared Pi packages.
 #
 # Can be run standalone or called by the root setup.sh / reinstall.sh.
 # ──────────────────────────────────────────────
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+PI_AGENT_DIR="$HOME/.pi/agent"
 PI_SETTINGS_SOURCE="$SCRIPT_DIR/settings.json"
-PI_SETTINGS_TARGET="$HOME/.pi/agent/settings.json"
+PI_SETTINGS_TARGET="$PI_AGENT_DIR/settings.json"
+PI_KEYBINDINGS_SOURCE="$SCRIPT_DIR/keybindings.json"
+PI_KEYBINDINGS_TARGET="$PI_AGENT_DIR/keybindings.json"
+PI_EXTENSIONS_SOURCE="$SCRIPT_DIR/extensions"
+PI_EXTENSIONS_TARGET="$PI_AGENT_DIR/extensions"
+PI_SKILLS_SOURCE="$SCRIPT_DIR/skills"
+PI_SKILLS_TARGET="$PI_AGENT_DIR/skills"
+PI_PROMPTS_SOURCE="$SCRIPT_DIR/prompts"
+PI_PROMPTS_TARGET="$PI_AGENT_DIR/prompts"
+PI_THEMES_SOURCE="$SCRIPT_DIR/themes"
+PI_THEMES_TARGET="$PI_AGENT_DIR/themes"
+
+SHARED_AGENTS_DIR="$SCRIPT_DIR/../agents"
+SHARED_SKILL_LOCK_SOURCE="$SHARED_AGENTS_DIR/.skill-lock.json"
+SHARED_SKILL_LOCK_TARGET="$HOME/.agents/.skill-lock.json"
+SHARED_FIND_SKILLS_SOURCE="$SHARED_AGENTS_DIR/skills/find-skills"
+SHARED_FIND_SKILLS_TARGET="$HOME/.agents/skills/find-skills"
+SHARED_GRILL_ME_SOURCE="$SHARED_AGENTS_DIR/skills/grill-me"
+SHARED_GRILL_ME_TARGET="$HOME/.agents/skills/grill-me"
 
 NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 NVM_INSTALL_VERSION="v0.40.3"
@@ -52,8 +71,21 @@ link_file() {
       rm "$target"
     fi
   elif [ -e "$target" ]; then
-    local backup="${target}.bak"
-    warn "$label file exists at $target, backing up to $backup"
+    local backup
+    case "$target" in
+      "$HOME/.agents/skills/"*)
+        local skill_backup_dir="$HOME/.agents/backups/skills"
+        mkdir -p "$skill_backup_dir"
+        backup="$skill_backup_dir/$(basename "$target").bak"
+        ;;
+      *)
+        backup="${target}.bak"
+        ;;
+    esac
+    if [ -e "$backup" ] || [ -L "$backup" ]; then
+      backup="${backup}.$(date +%Y%m%d%H%M%S)"
+    fi
+    warn "$label exists at $target, backing up to $backup"
     mv "$target" "$backup"
   fi
 
@@ -110,22 +142,23 @@ source_nvm() {
 }
 
 setup_node() {
+  if node_version_ok && command_exists npm; then
+    ok "Using compatible system Node $(node --version) and npm $(npm --version)"
+    return
+  fi
+
   install_nvm
   source_nvm
 
-  if node_version_ok && command_exists npm; then
-    ok "Node is compatible: $(node --version)"
-  else
-    info "Installing latest Node.js LTS via nvm..."
-    nvm install "$NODE_INSTALL_VERSION"
-    nvm use "$NODE_INSTALL_VERSION" >/dev/null
-    nvm alias default "$NODE_INSTALL_VERSION" >/dev/null
-    hash -r
-    ok "Latest Node.js LTS installed and set as default: $(node --version)"
-  fi
+  info "Installing latest Node.js LTS via nvm..."
+  nvm install "$NODE_INSTALL_VERSION"
+  nvm use "$NODE_INSTALL_VERSION" >/dev/null
+  nvm alias default "$NODE_INSTALL_VERSION" >/dev/null
+  hash -r
 
   node_version_ok || err "Node.js $REQUIRED_NODE_VERSION or newer is required for Pi"
   command_exists npm || err "npm is required for Pi"
+  ok "Latest Node.js LTS installed and set as default: $(node --version)"
   ok "Using Node $(node --version) and npm $(npm --version)"
 }
 
@@ -147,8 +180,22 @@ install_pi() {
   ok "Pi installed: $(pi --version 2>/dev/null || printf 'version unknown')"
 }
 
-setup_settings() {
-  link_file "pi settings" "$PI_SETTINGS_SOURCE" "$PI_SETTINGS_TARGET"
+setup_managed_config() {
+  link_file "Pi settings" "$PI_SETTINGS_SOURCE" "$PI_SETTINGS_TARGET"
+  link_file "Pi keybindings" "$PI_KEYBINDINGS_SOURCE" "$PI_KEYBINDINGS_TARGET"
+  link_file "Pi extensions" "$PI_EXTENSIONS_SOURCE" "$PI_EXTENSIONS_TARGET"
+  link_file "Pi skills" "$PI_SKILLS_SOURCE" "$PI_SKILLS_TARGET"
+  link_file "Pi prompts" "$PI_PROMPTS_SOURCE" "$PI_PROMPTS_TARGET"
+  link_file "Pi themes" "$PI_THEMES_SOURCE" "$PI_THEMES_TARGET"
+
+  link_file "shared skill lock" "$SHARED_SKILL_LOCK_SOURCE" "$SHARED_SKILL_LOCK_TARGET"
+  link_file "find-skills skill" "$SHARED_FIND_SKILLS_SOURCE" "$SHARED_FIND_SKILLS_TARGET"
+  link_file "grill-me skill" "$SHARED_GRILL_ME_SOURCE" "$SHARED_GRILL_ME_TARGET"
+}
+
+restore_packages() {
+  info "Restoring packages declared in Pi settings..."
+  pi update --extensions || warn "Could not restore every Pi package; retry with 'pi update --extensions'"
 }
 
 # ── Main ──────────────────────────────────────
@@ -161,12 +208,16 @@ main() {
   echo ""
 
   # 1. Install Pi
-  info "Step 1/2: Installing Pi..."
+  info "Step 1/3: Installing Pi..."
   install_pi
 
-  # 2. Symlink settings
-  info "Step 2/2: Symlinking Pi settings..."
-  setup_settings
+  # 2. Symlink managed configuration and resources
+  info "Step 2/3: Symlinking managed Pi configuration..."
+  setup_managed_config
+
+  # 3. Restore declared packages into Pi's local cache
+  info "Step 3/3: Restoring Pi packages..."
+  restore_packages
 
   echo ""
   ok "Pi setup complete!"
