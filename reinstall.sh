@@ -54,6 +54,7 @@ detect_linux_distro() {
       ubuntu|debian|pop|linuxmint|elementary) echo "debian" ;;
       arch|manjaro|endeavouros)               echo "arch" ;;
       fedora|rhel|centos|rocky|alma)          echo "fedora" ;;
+      nixos)                                   echo "nixos" ;;
       *)                                      echo "unknown" ;;
     esac
   else
@@ -481,6 +482,12 @@ main() {
 
   if [ "$os" = "macos" ] && is_root; then
     err "Do not run this script as root on macOS."
+  fi
+
+  if [ "$os" = "linux" ] && [ "$(detect_linux_distro)" = "nixos" ]; then
+    warn "NixOS uses the flake-based setup instead of this imperative reinstall script."
+    info "Run: sudo nixos-rebuild switch --flake $DOTFILES_DIR#nixos"
+    return
   fi
 
   echo ""

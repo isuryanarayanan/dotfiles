@@ -189,17 +189,15 @@ ZSH_AUTOSUGGEST_USE_ASYNC=true
 
 # ── PATH extras ───────────────────────────────
 
-# VS Code CLI
-export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
-
-# PostgreSQL 16 (Homebrew)
-export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
+if [[ "$OSTYPE" == darwin* ]]; then
+  # VS Code CLI, Homebrew PostgreSQL, and pip --user scripts
+  export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
+  export PATH="$HOME/Library/Python/3.9/bin:$PATH"
+fi
 
 # OpenCode
 export PATH="$HOME/.opencode/bin:$PATH"
-
-# Python user scripts (pip --user installs)
-export PATH="$HOME/Library/Python/3.9/bin:$PATH"
 
 # ── NVM (Node Version Manager) ────────────────
 
@@ -334,22 +332,25 @@ if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
 fi
 
-# bun completions
-[ -s "/Users/admin/.bun/_bun" ] && source "/Users/admin/.bun/_bun"
-
-# bun
+# Bun
 export BUN_INSTALL="$HOME/.bun"
+[ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Java (for Babashka/bbin)
-export JAVA_HOME="/opt/homebrew/Cellar/openjdk/25.0.2/libexec/openjdk.jdk/Contents/Home"
-export PATH="$JAVA_HOME/bin:$HOME/.local/bin:$PATH"
+if [[ "$OSTYPE" == darwin* ]] && [[ -x /usr/libexec/java_home ]]; then
+  JAVA_HOME="$(/usr/libexec/java_home 2>/dev/null)" && export JAVA_HOME
+  [[ -n "$JAVA_HOME" ]] && export PATH="$JAVA_HOME/bin:$PATH"
+fi
+export PATH="$HOME/.local/bin:$PATH"
+
 if command -v go >/dev/null 2>&1; then
   export PATH="$PATH:$(go env GOPATH)/bin"
 fi
 
-# Unifize bin
-export PATH="$HOME/Desktop/unifize/bin:$PATH"
+if [[ "$OSTYPE" == darwin* ]]; then
+  export PATH="$HOME/Desktop/unifize/bin:$PATH"
+fi
 
 # Google Cloud / Firebase
 export GOOGLE_CLOUD_PROJECT="unifize-a5011"
@@ -359,10 +360,6 @@ if command -v viki >/dev/null 2>&1; then
   eval "$(viki shell init zsh)"
 fi
 
-alias viki-mono='/opt/homebrew/bin/node /Users/apple/viki/.viki/labs/viki/viki-mono/packages/cli/bin/run.js'
-
-
-
-# >>> viki shell integration >>>
-eval "$(viki shell init zsh)"
-# <<< viki shell integration <<<
+if [[ -x /opt/homebrew/bin/node && -f "$HOME/viki/.viki/labs/viki/viki-mono/packages/cli/bin/run.js" ]]; then
+  alias viki-mono='/opt/homebrew/bin/node "$HOME/viki/.viki/labs/viki/viki-mono/packages/cli/bin/run.js"'
+fi

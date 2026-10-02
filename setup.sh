@@ -49,6 +49,7 @@ detect_linux_distro() {
       ubuntu|debian|pop|linuxmint|elementary) echo "debian" ;;
       arch|manjaro|endeavouros)               echo "arch" ;;
       fedora|rhel|centos|rocky|alma)          echo "fedora" ;;
+      nixos)                                   echo "nixos" ;;
       *)                                      echo "unknown" ;;
     esac
   else
@@ -391,6 +392,13 @@ main() {
 
   if [ "$os" = "macos" ] && is_root; then
     err "Do not run this script as root on macOS (Homebrew forbids it). Run as your normal user without sudo."
+  fi
+
+  if [ "$os" = "linux" ] && [ "$(detect_linux_distro)" = "nixos" ]; then
+    warn "NixOS uses the flake-based setup instead of this imperative installer."
+    info "Clone the repo to $DOTFILES_DIR, then run:"
+    info "sudo nixos-rebuild switch --flake $DOTFILES_DIR#nixos --extra-experimental-features 'nix-command flakes'"
+    return
   fi
 
   echo ""

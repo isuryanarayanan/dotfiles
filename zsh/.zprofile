@@ -16,4 +16,4 @@ elif [[ -f /usr/local/bin/brew ]]; then
   eval "$(/usr/local/bin/brew shellenv zsh)"
 fi
 
-export PATH="/Users/admin/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"

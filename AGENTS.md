@@ -12,6 +12,7 @@ Guidelines for AI agents working in this dotfiles repository.
    - Tmux: `tmux/setup_tmux.sh`, then `tmux/.tmux.conf`
    - Ghostty: `ghostty/config`
    - Pi: `pi/setup_pi.sh`, `pi/settings.json`, `pi/extensions/`
+   - NixOS: `flake.nix`, `nix/hosts/`, `nix/modules/`, `nix/users/`
 3. Prefer small, targeted edits. Validate syntax after touching scripts or Lua.
 4. Do not edit generated/local machine-specific files unless explicitly asked, especially `nvim/nvim/lua/plugins/theme.lua`.
 
@@ -43,8 +44,15 @@ dotfiles/
   SETUP_LINUX.md            # Linux setup notes
   SETUP_MACOS.md            # macOS setup notes
   SCRATCHPAD.md             # Personal scratchpad/notes
-  setup.sh                  # Full bootstrap, designed for curl | bash
-  reinstall.sh              # Sync/reconcile an existing install with remote
+  setup.sh                  # Bootstrap for macOS and conventional Linux
+  reinstall.sh              # Reconcile an existing non-NixOS install
+  flake.nix                 # NixOS and Home Manager entry point
+
+  nix/
+    hosts/nixos/            # Host and hardware configuration
+    modules/nixos/          # Shared NixOS modules
+    modules/home/           # Home Manager packages and writable links
+    users/suryan.nix        # User Home Manager configuration
 
   agents/
     .skill-lock.json        # Shared skill installation metadata
@@ -102,16 +110,17 @@ Use this order when trying to understand behavior:
 
 1. **Bootstrap flow**: start in `setup.sh`, then follow calls to tool-specific setup scripts.
 2. **Reinstall/repair flow**: start in `reinstall.sh`; it verifies symlinks and re-runs setup where needed.
-3. **Symlink target**: for a live config issue, inspect the symlink map below and edit the repo target, not the file under `~`.
-4. **Neovim**:
+3. **NixOS flow**: start in `flake.nix`, then the host under `nix/hosts/`, shared system modules, and Home Manager modules. Do not run `setup.sh` on NixOS.
+4. **Symlink target**: for a live config issue, inspect the symlink map below and edit the repo target, not the file under `~`.
+5. **Neovim**:
    - `nvim/nvim/init.lua` loads `lua/config/lazy.lua`.
    - Core settings live in `lua/config/options.lua`, `keymaps.lua`, and `autocmds.lua`.
    - Feature/plugin changes live in `lua/plugins/*.lua` as Lazy.nvim specs.
-5. **Zsh**:
+6. **Zsh**:
    - `.zshenv` must stay minimal and silent.
    - `.zprofile` is login-shell setup.
    - `.zshrc` contains interactive plugins, aliases, keybindings, prompt setup.
-6. **Pi**:
+7. **Pi**:
    - Managed files and resource directories under `pi/` are symlinked into `~/.pi/agent/`.
    - Shared cross-agent skills live under `agents/`; Pi-specific skills live under `pi/skills/`.
    - Package declarations are tracked in `pi/settings.json`; installed npm contents remain local.
@@ -153,8 +162,19 @@ stylua nvim/nvim/
 nvim --headless '+quit'
 ```
 
+### Nix
+
+```bash
+# Evaluate the flake when Nix is available
+nix flake check
+
+# Build without activating the NixOS host
+nixos-rebuild build --flake .#nixos
+```
+
 ### Validating Changes
 
+- **NixOS config**: run `nix flake check`, then build before using `test` or `switch` on the host.
 - **Neovim config**: Open `nvim` and confirm no startup errors; run `:checkhealth` for deeper checks.
 - **Tmux config**: Run `tmux source-file ~/.tmux.conf` or press `prefix + r` inside tmux.
 - **Zsh config**: Run `source ~/.zshrc` in a running interactive shell, or open a new terminal.

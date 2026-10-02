@@ -1,6 +1,8 @@
 # Setup - Linux
 
-Step-by-step guide to set up these dotfiles on a fresh Linux machine.
+Step-by-step guide to set up these dotfiles on a fresh conventional Linux machine.
+
+> NixOS uses the declarative flake and Home Manager flow documented in [SETUP_NIXOS.md](SETUP_NIXOS.md), not these imperative installation steps.
 
 ## Prerequisites
 
