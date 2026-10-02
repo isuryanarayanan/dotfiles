@@ -397,7 +397,7 @@ main() {
   if [ "$os" = "linux" ] && [ "$(detect_linux_distro)" = "nixos" ]; then
     warn "NixOS uses the flake-based setup instead of this imperative installer."
     info "Clone the repo to $DOTFILES_DIR, then run:"
-    info "sudo nixos-rebuild switch --flake $DOTFILES_DIR#nixos --extra-experimental-features 'nix-command flakes'"
+    info "sudo nixos-rebuild switch --flake $DOTFILES_DIR#nixos --option experimental-features 'nix-command flakes' --no-reexec"
     return
   fi
 

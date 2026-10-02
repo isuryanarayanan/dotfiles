@@ -31,7 +31,7 @@ Build the NixOS configuration without activating it:
 ```bash
 sudo nixos-rebuild build \
   --flake ~/dotfiles#nixos \
-  --extra-experimental-features "nix-command flakes"
+  --option experimental-features "nix-command flakes"
 ```
 
 Review the build, then test it for the current boot only:
@@ -39,7 +39,8 @@ Review the build, then test it for the current boot only:
 ```bash
 sudo nixos-rebuild test \
   --flake ~/dotfiles#nixos \
-  --extra-experimental-features "nix-command flakes"
+  --option experimental-features "nix-command flakes" \
+  --no-reexec
 ```
 
 When the test is healthy, make it the active boot configuration:
@@ -47,7 +48,8 @@ When the test is healthy, make it the active boot configuration:
 ```bash
 sudo nixos-rebuild switch \
   --flake ~/dotfiles#nixos \
-  --extra-experimental-features "nix-command flakes"
+  --option experimental-features "nix-command flakes" \
+  --no-reexec
 ```
 
 The resulting system enables `nix-command` and `flakes`, so later rebuilds only need:
