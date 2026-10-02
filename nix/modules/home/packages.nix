@@ -14,12 +14,14 @@
     neovim
     nodejs_22
     pi-coding-agent
+    python311
     ripgrep
     starship
     tlrc
     tmux
     tree-sitter
     unzip
+    uv
     wl-clipboard
     xclip
     zoxide
