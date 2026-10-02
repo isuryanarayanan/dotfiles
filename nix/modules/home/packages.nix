@@ -19,6 +19,7 @@
     starship
     tlrc
     tmux
+    tmux-sessionizer
     tree-sitter
     unzip
     uv
